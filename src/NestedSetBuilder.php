@@ -24,4 +24,19 @@ class NestedSetBuilder extends Builder
             $values
         );
     }
+
+    /**
+     * Delete records from the database.
+     *
+     * @return bool
+     */
+    public function delete(): bool
+    {
+        /** @var NestedSet $model */
+        $model = $this->getModel();
+
+        return $model->nestedSetDriver->delete(
+            $model->getAttribute($model->getKeyName())
+        );
+    }
 }

@@ -26,7 +26,7 @@ trait NestedSet
      *
      * @var bool
      */
-    protected static bool $willRebase = false;
+    protected static bool $nestedSetNeedToSubstitudeBuilder = false;
 
     /**
      * Драйвер для работы с БД.
@@ -65,11 +65,14 @@ trait NestedSet
      */
     protected function setKeysForSaveQuery($query): Builder
     {
-        // При обновлении элемента, следует обновлять все поддерево, а не только сам элемент
-        if ($this->exists && static::$willRebase && $this->isDirty($this->parentIdName)) {
+        // При обновлении элемента, следует обновлять все поддерево, а не только сам элемент.
+        // При удалении элемента также следует удалять все поддерево.
+        if (static::$nestedSetNeedToSubstitudeBuilder) {
             /** @var Model|NestedSet $this */
             $nestedSetBuilder = new NestedSetBuilder($query->getQuery());
             $nestedSetBuilder->setModel($this);
+
+            static::$nestedSetNeedToSubstitudeBuilder = false;
 
             return $nestedSetBuilder;
         }

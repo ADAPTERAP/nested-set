@@ -172,6 +172,51 @@ class MySqlDriver extends NestedSetDriver
     }
 
     /**
+     * Удаляет элемент с указанным идентификатором.
+     *
+     * @param int|string $primary
+     *
+     * @return bool
+     */
+    public function delete($primary): bool
+    {
+        $sql = "
+            WITH `item` AS (SELECT `lft`, `rgt` FROM `table` WHERE `id` = ?)
+            DELETE
+            FROM `table`
+            WHERE `lft` >= (SELECT `lft` FROM `item`) AND `rgt` <= (SELECT `rgt` FROM `item`);
+        ";
+
+        return Manager::connection()->statement(
+            $this->prepareNestedSetSql($sql),
+            [$primary]
+        );
+    }
+
+    /**
+     * Обновляет индексы после удаления поддерева.
+     *
+     * @param int $lft
+     * @param int $rgt
+     */
+    public function freshIndexesAfterDelete(int $lft, int $rgt): void
+    {
+        $diff = $rgt - $lft + 1;
+
+        $sql = "
+            UPDATE `table`
+            SET `lft` = IF(`lft` > ?, `lft` - ?, `lft`),
+                `rgt` = IF(`rgt` > ?, `rgt` - ?, `rgt`)
+            WHERE `lft` > ? OR `rgt` > ?
+        ";
+
+        Manager::connection()->statement(
+            $this->prepareNestedSetSql($sql),
+            [$rgt, $diff, $rgt, $diff, $rgt, $rgt]
+        );
+    }
+
+    /**
      * Подготавливает SQL запрос.
      *
      * @param string $sql

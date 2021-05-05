@@ -33,9 +33,15 @@ trait Subscriber
             $model->nestedSetBeforeUpdate();
         });
 
-        static::updated(static function ($model) {
+        static::deleting(static function ($model) {
             /** @var NestedSet $model */
-            $model->nestedSetAfterUpdate();
+            $model->refresh();
+            $model->nestedSetBeforeDelete();
+        });
+
+        static::deleted(static function ($model) {
+            /** @var NestedSet $model */
+            $model->nestedSetAfterDelete();
         });
     }
 
@@ -85,17 +91,26 @@ trait Subscriber
             return;
         }
 
-        static::$willRebase = true;
+        static::$nestedSetNeedToSubstitudeBuilder = true;
     }
 
     /**
-     * Выполняемые действия после обновления модели.
-     *
-     * @return void
+     * Выполняемые действия перед удалением.
      */
-    protected function nestedSetAfterUpdate(): void
+    protected function nestedSetBeforeDelete(): void
     {
-        static::$willRebase = false;
+        static::$nestedSetNeedToSubstitudeBuilder = true;
+    }
+
+    /**
+     * Выполняемые действия после удаления модели.
+     */
+    protected function nestedSetAfterDelete(): void
+    {
+        $this->nestedSetDriver->freshIndexesAfterDelete(
+            $this->getAttribute($this->lftName),
+            $this->getAttribute($this->rgtName)
+        );
     }
 
     /**

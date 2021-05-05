@@ -97,4 +97,21 @@ abstract class NestedSetDriver
      * @return int
      */
     abstract public function rebaseSubTree(int $id, int $parentId, array $values): int;
+
+    /**
+     * Удаляет элемент с указанным идентификатором.
+     *
+     * @param int|string $primary
+     *
+     * @return bool
+     */
+    abstract public function delete($primary): bool;
+
+    /**
+     * Обновляет индексы после удаления поддерева.
+     *
+     * @param int $lft
+     * @param int $rgt
+     */
+    abstract public function freshIndexesAfterDelete(int $lft, int $rgt): void;
 }
