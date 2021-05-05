@@ -28,14 +28,14 @@ class SiblingsRelation extends BaseRelation
     {
         // Соотносим найденные модели
         foreach ($models as $index => $model) {
-            $modelParentId = $model->getAttribute($model->parentIdName);
+            $modelParentId = $model->getParentId();
 
             $models[$index] = $model->setRelation(
                 $relation,
                 $results
                     ->filter(function ($potentialSibling) use ($modelParentId) {
                         /** @var NestedSet $potentialSibling */
-                        $potentialSiblingParentId = $potentialSibling->getAttribute($potentialSibling->parentIdName);
+                        $potentialSiblingParentId = $potentialSibling->getParentId();
 
                         return $potentialSiblingParentId === $modelParentId;
                     })
@@ -57,7 +57,7 @@ class SiblingsRelation extends BaseRelation
     protected static function addFiltersForModel(Builder $builder, Model $model): Builder
     {
         return $builder
-            ->where($model->parentIdName, $model->getAttribute($model->parentIdName))
-            ->where($model->getKeyName(), '!=', $model->getAttribute($model->getKeyName()));
+            ->where($model->getParentIdName(), $model->getParentId())
+            ->where($model->getKeyName(), '!=', $model->getKey());
     }
 }

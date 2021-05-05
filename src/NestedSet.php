@@ -22,7 +22,7 @@ trait NestedSet
     use Attributes, Subscriber, Relations;
 
     /**
-     * Свойство, меняющее поведение билдера при перемещении поддерева.
+     * Свойство, меняющее поведение builder при перемещении поддерева.
      *
      * @var bool
      */
@@ -43,14 +43,8 @@ trait NestedSet
         $connectionDriverName = $this->getConnection()->getDriverName();
 
         if ($connectionDriverName === 'mysql') {
-            $this->nestedSetDriver = new MySqlDriver(
-                $this->getTable(),
-                $this->getKeyName(),
-                $this->lftName,
-                $this->rgtName,
-                $this->parentIdName,
-                $this->depthName
-            );
+            /** @var Model|NestedSet $this */
+            $this->nestedSetDriver = new MySqlDriver($this);
         } else {
             throw new NestedSetDriverNotSupported($connectionDriverName);
         }

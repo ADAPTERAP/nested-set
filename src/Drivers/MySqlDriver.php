@@ -26,7 +26,7 @@ class MySqlDriver extends NestedSetDriver
                 WHERE (`rgt` >= ? AND `id` != ?) OR `lft` > ?
         ";
 
-        Manager::table($this->table)
+        Manager::table($this->model->getTable())
             ->getConnection()
             ->statement($this->prepareNestedSetSql($sql), [$lft, $lft, $primary, $lft, $primary, $lft]);
     }
@@ -40,43 +40,43 @@ class MySqlDriver extends NestedSetDriver
      */
     public function getAttributesForInsert(array $attributes): array
     {
-        $parentId = $attributes[$this->parentIdName] ?? null;
+        $parentId = $attributes[$this->model->getParentIdName()] ?? null;
 
         if ($parentId !== null && !is_numeric($parentId)) {
             return $attributes;
         }
 
         if ($parentId === null) {
-            $attributes[$this->lftName] = new Expression(
+            $attributes[$this->model->getLftName()] = new Expression(
                 $this->prepareNestedSetSql(
                     "(SELECT `max` + 1 FROM (SELECT COALESCE(MAX(`rgt`), -1) AS `max` FROM `table` WHERE `parent_id` IS NULL) t)"
                 )
             );
 
-            $attributes[$this->rgtName] = new Expression(
+            $attributes[$this->model->getRgtName()] = new Expression(
                 $this->prepareNestedSetSql(
                     "(SELECT `max` + 2 FROM (SELECT COALESCE(MAX(`rgt`), -1) AS `max` FROM `table` WHERE `parent_id` IS NULL) t)"
                 )
             );
 
-            $attributes[$this->depthName] = 0;
+            $attributes[$this->model->getDepthName()] = 0;
 
             return $attributes;
         }
 
-        $attributes[$this->lftName] = new Expression(
+        $attributes[$this->model->getLftName()] = new Expression(
             $this->prepareNestedSetSql(
                 "(SELECT `rgt` FROM (SELECT `rgt` FROM `table` WHERE `id` = {$parentId}) t)"
             )
         );
 
-        $attributes[$this->rgtName] = new Expression(
+        $attributes[$this->model->getRgtName()] = new Expression(
             $this->prepareNestedSetSql(
                 "(SELECT `rgt` + 1 FROM (SELECT `rgt` FROM `table` WHERE `id` = {$parentId}) t)"
             )
         );
 
-        $attributes[$this->depthName] = new Expression(
+        $attributes[$this->model->getDepthName()] = new Expression(
             $this->prepareNestedSetSql(
                 "(SELECT `depth` + 1 FROM (SELECT `depth` FROM `table` WHERE `id` = {$parentId}) t)"
             )
@@ -102,8 +102,15 @@ class MySqlDriver extends NestedSetDriver
             . $this->getSetClauseForRebaseSubTree();
 
         // Добавляем в запрос обновление пользовательских значений
+        $nestedSetColumns = [
+            $this->model->getLftName(),
+            $this->model->getRgtName(),
+            $this->model->getParentIdName(),
+            $this->model->getDepthName()
+        ];
+
         foreach ($values as $field => $value) {
-            if (in_array($field, [$this->lftName, $this->rgtName, $this->parentIdName, $this->depthName], true)) {
+            if (in_array($field, $nestedSetColumns, true)) {
                 continue;
             }
 
@@ -174,8 +181,16 @@ class MySqlDriver extends NestedSetDriver
     protected function prepareNestedSetSql(string $sql): string
     {
         return str_replace(
-            ['`lft`', '`rgt`', '`parent_id`', '`depth`', '`id`', '`table`'],
-            ["`{$this->lftName}`", "`{$this->rgtName}`", "`{$this->parentIdName}`", "`{$this->depthName}`", "`{$this->primaryName}`", "`{$this->table}`"],
+            ['`lft`', '`rgt`', '`parent_id`', '`depth`', '`id`', '`table`', '`deleted_at`'],
+            [
+                "`{$this->model->getLftName()}`",
+                "`{$this->model->getRgtName()}`",
+                "`{$this->model->getParentIdName()}`",
+                "`{$this->model->getDepthName()}`",
+                "`{$this->model->getKeyName()}`",
+                "`{$this->model->getTable()}`",
+                "`{$this->model->getDeletedAtColumn()}`",
+            ],
             $sql
         );
     }

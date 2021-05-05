@@ -2,68 +2,28 @@
 
 namespace Adapterap\NestedSet\Drivers;
 
+use Adapterap\NestedSet\NestedSet;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Collection as SupportCollection;
+
 abstract class NestedSetDriver
 {
     /**
-     * Название таблицы с которой работает драйвер.
+     * Экземпляр модели, которая содержит имена полей.
      *
-     * @var string
+     * @var Model|NestedSet|SoftDeletes
      */
-    protected string $table;
-
-    /**
-     * Название колонки с идексом вложенности слева.
-     *
-     * @var string
-     */
-    protected string $lftName;
-
-    /**
-     * Название колонки с идексом вложенности справа.
-     *
-     * @var string
-     */
-    protected string $rgtName;
-
-    /**
-     * Название колонки с идентификатором родительского элемента.
-     *
-     * @var string
-     */
-    protected string $parentIdName;
-
-    /**
-     * Название колонки со значением глубины вложенности.
-     *
-     * @var string
-     */
-    protected string $depthName;
-
-    /**
-     * Название колонки с primary ключом.
-     *
-     * @var string
-     */
-    protected string $primaryName;
+    protected Model $model;
 
     /**
      * MySqlDriver constructor.
      *
-     * @param string $table
-     * @param string $primaryName
-     * @param string $lftName
-     * @param string $rgtName
-     * @param string $parentIdName
-     * @param string $depthName
+     * @param Model $model
      */
-    public function __construct(string $table, string $primaryName, string $lftName, string $rgtName, string $parentIdName, string $depthName)
+    public function __construct(Model $model)
     {
-        $this->table = $table;
-        $this->lftName = $lftName;
-        $this->rgtName = $rgtName;
-        $this->parentIdName = $parentIdName;
-        $this->depthName = $depthName;
-        $this->primaryName = $primaryName;
+        $this->model = $model;
     }
 
     /**

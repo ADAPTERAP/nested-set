@@ -19,8 +19,8 @@ class NestedSetBuilder extends Builder
         $model = $this->getModel();
 
         return $model->nestedSetDriver->rebaseSubTree(
-            $model->getOriginal($model->getKeyName()) ?? $model->getAttribute($model->getKeyName()),
-            $model->getAttribute($model->parentIdName),
+            $model->getOriginal($model->getKeyName()) ?? $model->getKey(),
+            $model->getParentId(),
             $values
         );
     }

@@ -29,7 +29,7 @@ trait Relations
      */
     public function parent(): BelongsTo
     {
-        return $this->belongsTo(static::class, $this->parentIdName, $this->getKeyName());
+        return $this->belongsTo(static::class, $this->getParentIdName(), $this->getKeyName());
     }
 
     /**
@@ -39,7 +39,7 @@ trait Relations
      */
     public function children(): HasMany
     {
-        return $this->hasMany(static::class, $this->parentIdName, $this->getKeyName());
+        return $this->hasMany(static::class, $this->getParentIdName(), $this->getKeyName());
     }
 
     /**

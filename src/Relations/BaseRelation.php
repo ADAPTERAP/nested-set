@@ -37,7 +37,7 @@ abstract class BaseRelation extends Relation
         static::addFiltersForModel($this->query, $this->parent);
 
         if (empty($this->query->getQuery()->orders)) {
-            $this->query->orderBy($this->parent->lftName, $this->defaultOrderDirection);
+            $this->query->orderBy($this->parent->getLftName(), $this->defaultOrderDirection);
         }
     }
 
@@ -59,7 +59,7 @@ abstract class BaseRelation extends Relation
         });
 
         if (empty($this->query->getQuery()->orders)) {
-            $this->query->orderBy($models[0]->lftName, $this->defaultOrderDirection);
+            $this->query->orderBy($models[0]->getLftName(), $this->defaultOrderDirection);
         }
     }
 
@@ -99,7 +99,7 @@ abstract class BaseRelation extends Relation
     public function getResults(): Collection
     {
         if (empty($this->query->getQuery()->orders)) {
-            $this->query->orderBy($this->parent->lftName, $this->defaultOrderDirection);
+            $this->query->orderBy($this->parent->getLftName(), $this->defaultOrderDirection);
         }
 
         return $this->query->get();

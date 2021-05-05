@@ -64,7 +64,7 @@ trait Subscriber
      */
     protected function nestedSetAfterCreate(): void
     {
-        $parentId = $this->getAttribute($this->parentIdName);
+        $parentId = $this->getParentId();
 
         // todo: Подумать как уйти от этого
         if ($this->nestedSetHasExpressionInAttributes()) {
@@ -73,8 +73,8 @@ trait Subscriber
 
         // Обновляем индексы вложенности, если это не рутовый элемент.
         if ($parentId !== null) {
-            $primary = $this->getAttribute($this->getKeyName());
-            $lft = $this->getAttribute($this->lftName);
+            $primary = $this->getKey();
+            $lft = $this->getLft();
 
             $this->nestedSetDriver->freshIndexesAfterInsert($primary, $lft);
         }
@@ -87,7 +87,7 @@ trait Subscriber
      */
     protected function nestedSetBeforeUpdate(): void
     {
-        if (!$this->isDirty($this->parentIdName)) {
+        if (!$this->isDirty($this->getParentIdName())) {
             return;
         }
 
@@ -120,11 +120,11 @@ trait Subscriber
      */
     protected function nestedSetHasExpressionInAttributes(): bool
     {
-        if ($this->getAttribute($this->lftName) instanceof Expression) {
+        if ($this->getLft() instanceof Expression) {
             return true;
         }
 
-        if ($this->getAttribute($this->rgtName) instanceof Expression) {
+        if ($this->getRgt() instanceof Expression) {
             return true;
         }
 

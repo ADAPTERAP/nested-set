@@ -64,8 +64,8 @@ class AncestorsRelation extends BaseRelation
      */
     protected static function addFiltersForModel(Builder $builder, Model $model): Builder
     {
-        $lftName = $model->lftName;
-        $rgtName = $model->rgtName;
+        $lftName = $model->getLftName();
+        $rgtName = $model->getRgtName();
         $tableName = $model->getTable();
         $primaryName = $model->getKeyName();
         $primary = $model->getAttribute($primaryName);
@@ -78,19 +78,20 @@ class AncestorsRelation extends BaseRelation
     /**
      * Возвращает массив идентификаторов предков для указанной модели.
      *
-     * @param Model $model
+     * @param Model|NestedSet $model
      * @param Collection $relations
      *
      * @return int[]
      */
     protected static function getAncestorIds(Model $model, Collection $relations): array
     {
+        /** @var Collection|Model[]|NestedSet[] $ancestors */
         $ancestors = clone $relations;
         $result = [];
 
         foreach ($ancestors as $index => $ancestor) {
-            $ancestorId = $ancestor->getAttribute($ancestor->getKeyName());
-            $modelParentId = $model->getAttribute($model->parentIdName);
+            $ancestorId = $ancestor->getKey();
+            $modelParentId = $model->getParentId();
 
             if ($modelParentId === $ancestorId) {
                 $result[] = $ancestorId;

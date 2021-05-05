@@ -57,8 +57,8 @@ class DescendantsRelation extends BaseRelation
      */
     protected static function addFiltersForModel(Builder $builder, Model $model): Builder
     {
-        $lftName = $model->lftName;
-        $rgtName = $model->rgtName;
+        $lftName = $model->getLftName();
+        $rgtName = $model->getRgtName();
         $tableName = $model->getTable();
         $primaryName = $model->getKeyName();
         $primary = $model->getAttribute($primaryName);
@@ -84,8 +84,8 @@ class DescendantsRelation extends BaseRelation
         $result = [];
 
         foreach ($descendants as $index => $descendant) {
-            $descendantParentId = $descendant->getAttribute($descendant->parentIdName);
-            $descendantPrimary = $descendant->getAttribute($descendant->getKeyName());
+            $descendantParentId = $descendant->getParentId();
+            $descendantPrimary = $descendant->getKey();
 
             if ($modelId === $descendantParentId) {
                 $result[] = $descendantPrimary;
