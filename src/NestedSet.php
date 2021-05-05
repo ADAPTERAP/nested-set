@@ -8,6 +8,7 @@ use Adapterap\NestedSet\Exceptions\NestedSetDriverNotSupported;
 use Adapterap\NestedSet\Traits\Attributes;
 use Adapterap\NestedSet\Traits\Relations;
 use Adapterap\NestedSet\Traits\Subscriber;
+use Adapterap\NestedSet\Traits\Tree;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
@@ -19,7 +20,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 trait NestedSet
 {
-    use Attributes, Subscriber, Relations;
+    use Attributes, Subscriber, Relations, Tree;
 
     /**
      * Свойство, меняющее поведение builder при перемещении поддерева.

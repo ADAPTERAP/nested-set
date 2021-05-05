@@ -58,7 +58,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
         $schema->dropIfExists('categories');
         $schema->create('categories', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('name')->unique();
             $table->unsignedBigInteger('parent_id')
                 ->nullable();
             $table->unsignedBigInteger('lft');
@@ -82,6 +82,21 @@ class TestCase extends \PHPUnit\Framework\TestCase
     public static function assertDatabaseHas(string $table, array $filters): void
     {
         self::assertTrue(
+            Manager::table($table)
+                ->where($filters)
+                ->exists()
+        );
+    }
+
+    /**
+     * Проверяет отсутствие данных в БД.
+     *
+     * @param string $table
+     * @param array $filters
+     */
+    public static function assertDatabaseDoesNotHave(string $table, array $filters): void
+    {
+        self::assertFalse(
             Manager::table($table)
                 ->where($filters)
                 ->exists()

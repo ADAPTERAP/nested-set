@@ -95,4 +95,24 @@ abstract class NestedSetDriver
     {
         return in_array(SoftDeletes::class, class_uses($this->model), true);
     }
+
+    /**
+     * Insert new records or update the existing ones.
+     *
+     * @param array $preparedValues
+     * @param array $uniqueBy
+     * @param array|null $update
+     *
+     * @return SupportCollection
+     */
+    abstract public function upsert(array $preparedValues, array $uniqueBy, array $update = null): SupportCollection;
+
+    /**
+     * Удаляет неиспользуемые элементы дерева.
+     *
+     * @param array $usedPrimaries
+     *
+     * @return void
+     */
+    abstract public function deleteUnusedItems(array $usedPrimaries): void;
 }

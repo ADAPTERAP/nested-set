@@ -194,6 +194,60 @@ class MySqlDriver extends NestedSetDriver
     }
 
     /**
+     * Insert new records or update the existing ones.
+     *
+     * @param array $preparedValues
+     * @param array $uniqueBy
+     * @param array|null $update
+     *
+     * @return SupportCollection
+     */
+    public function upsert(array $preparedValues, array $uniqueBy, array $update = null): SupportCollection
+    {
+        Manager::connection()
+            ->table($this->model->getTable())
+            ->upsert(array_values($preparedValues), $uniqueBy, $update);
+
+        $builder = Manager::connection()
+            ->table($this->model->getTable());
+
+        foreach ($preparedValues as $item) {
+            $builder->orWhere(function ($builder) use ($item) {
+                /** @var Builder $builder */
+                if (!empty($this->uniqueBy)) {
+                    foreach ($this->uniqueBy as $fieldName) {
+                        $builder->where($fieldName, $item[$fieldName] ?? null);
+                    }
+                } else {
+                    $builder
+                        ->where($this->model->getLftName(), $item[$this->model->getLftName()])
+                        ->where($this->model->getRgtName(), $item[$this->model->getRgtName()])
+                        ->where($this->model->getDepthName(), $item[$this->model->getDepthName()])
+                        ->where($this->model->getParentIdName(), $item[$this->model->getParentIdName()]);
+                }
+            });
+        }
+
+        // Запрашиваем найденные строки
+        return $builder->get();
+    }
+
+    /**
+     * Удаляет неиспользуемые элементы дерева.
+     *
+     * @param array $usedPrimaries
+     *
+     * @return void
+     */
+    public function deleteUnusedItems(array $usedPrimaries): void
+    {
+        $this->model
+            ->newQuery()
+            ->whereNotIn($this->model->getKeyName(), $usedPrimaries)
+            ->delete();
+    }
+
+    /**
      * Подготавливает SQL запрос.
      *
      * @param string $sql
