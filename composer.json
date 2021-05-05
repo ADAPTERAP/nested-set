@@ -14,8 +14,8 @@
     ],
     "require": {
         "php": ">=7.4|>=8.0",
-        "illuminate/database": "^8.x-dev",
-        "illuminate/events": "^8.x-dev"
+        "illuminate/database": "^8.0",
+        "illuminate/events": "^8.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.5",
