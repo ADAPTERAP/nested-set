@@ -185,37 +185,4 @@ class AncestorsTest extends TestCase
         self::assertEquals($child11->id, $ancestors->get(1)->id);
         self::assertEquals($root1->id, $ancestors->get(2)->id);
     }
-
-    /**
-     * Создает дерево элементов для тестирования.
-     *
-     * @return array
-     */
-    protected function createTree(): array
-    {
-        $root1 = Category::factory()->create(['name' => '1']);
-        $root2 = Category::factory()->create(['name' => '2']);
-        $root3 = Category::factory()->create(['name' => '3']);
-
-        $child11 = Category::factory()->create(['parent_id' => $root1->id, 'name' => '1.1']);
-        $child21 = Category::factory()->create(['parent_id' => $root2->id, 'name' => '2.1']);
-        $child31 = Category::factory()->create(['parent_id' => $root3->id, 'name' => '3.1']);
-
-        $child111 = Category::factory()->create(['parent_id' => $child11->id, 'name' => '1.1.1']);
-
-        $child1111 = Category::factory()->create(['parent_id' => $child111->id, 'name' => '1.1.1.1']);
-        $child1112 = Category::factory()->create(['parent_id' => $child111->id, 'name' => '1.1.1.2']);
-
-        return compact(
-            'root1',
-            'root2',
-            'root3',
-            'child11',
-            'child21',
-            'child31',
-            'child111',
-            'child1111',
-            'child1112',
-        );
-    }
 }
