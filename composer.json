@@ -3,8 +3,9 @@
     "description": "Библиотека для работы с деревьями в БД",
     "type": "library",
     "license": "MIT",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "minimum-stability": "dev",
+    "prefer-stable": true,
     "authors": [
         {
             "name": "lapaliv",
