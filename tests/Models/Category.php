@@ -4,9 +4,11 @@ namespace Adapterap\NestedSet\Tests\Models;
 
 use Adapterap\NestedSet\NestedSet;
 use Adapterap\NestedSet\Tests\Factories\CategoryFactory;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class Category

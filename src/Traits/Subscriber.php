@@ -97,7 +97,7 @@ trait Subscriber
             return;
         }
 
-        static::$nestedSetNeedToSubstitudeBuilder = true;
+        $this->nestedSetNeedToSubstituteBuilder = true;
     }
 
     /**
@@ -105,7 +105,7 @@ trait Subscriber
      */
     protected function nestedSetBeforeDelete(): void
     {
-        static::$nestedSetNeedToSubstitudeBuilder = true;
+        $this->nestedSetNeedToSubstituteBuilder = true;
     }
 
     /**

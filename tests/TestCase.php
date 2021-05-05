@@ -5,7 +5,6 @@ namespace Adapterap\NestedSet\Tests;
 use Adapterap\NestedSet\Tests\Models\Category;
 use Illuminate\Container\Container;
 use Illuminate\Database\Capsule\Manager;
-use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\ConnectionResolver;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Events\Dispatcher;
@@ -13,7 +12,12 @@ use Symfony\Component\VarDumper\VarDumper;
 
 class TestCase extends \PHPUnit\Framework\TestCase
 {
-    protected static $isConfiguredManager = false;
+    /**
+     * Позволяет не настраивать несколько раз Manager.
+     *
+     * @var bool
+     */
+    protected static bool $isConfiguredManager = false;
 
     /**
      * This method is called before the first test of this test class is run.
@@ -69,10 +73,16 @@ class TestCase extends \PHPUnit\Framework\TestCase
         });
     }
 
+    /**
+     * Проверяет наличие данных в БД.
+     *
+     * @param string $table
+     * @param array $filters
+     */
     public static function assertDatabaseHas(string $table, array $filters): void
     {
         self::assertTrue(
-            Capsule::table($table)
+            Manager::table($table)
                 ->where($filters)
                 ->exists()
         );
