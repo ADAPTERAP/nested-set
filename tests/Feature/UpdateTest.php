@@ -41,13 +41,13 @@ class UpdateTest extends TestCase
         self::assertDatabaseHas('categories', ['id' => $root3->id, 'lft' => 10, 'rgt' => 13, 'depth' => 0]);
         self::assertDatabaseHas('categories', ['id' => $child31->id, 'lft' => 11, 'rgt' => 12, 'depth' => 1]);
 
-        $target->update(['parent_id' => $child21->id]);
+        $target->update(['parent_id' => $child21->id, 'name' => '2.1.1']);
 
         self::assertDatabaseHas('categories', ['id' => $root1->id, 'lft' => 0, 'rgt' => 3, 'depth' => 0]);
         self::assertDatabaseHas('categories', ['id' => $child11->id, 'lft' => 1, 'rgt' => 2, 'depth' => 1]);
         self::assertDatabaseHas('categories', ['id' => $root2->id, 'lft' => 4, 'rgt' => 9, 'depth' => 0]);
         self::assertDatabaseHas('categories', ['id' => $child21->id, 'lft' => 5, 'rgt' => 8, 'depth' => 1]);
-        self::assertDatabaseHas('categories', ['id' => $target->id, 'lft' => 6, 'rgt' => 7, 'depth' => 2]);
+        self::assertDatabaseHas('categories', ['id' => $target->id, 'lft' => 6, 'rgt' => 7, 'depth' => 2, 'name' => '2.1.1']);
         self::assertDatabaseHas('categories', ['id' => $root3->id, 'lft' => 10, 'rgt' => 13, 'depth' => 0]);
         self::assertDatabaseHas('categories', ['id' => $child31->id, 'lft' => 11, 'rgt' => 12, 'depth' => 1]);
     }
@@ -75,11 +75,11 @@ class UpdateTest extends TestCase
         self::assertDatabaseHas('categories', ['id' => $root3->id, 'lft' => 10, 'rgt' => 13, 'depth' => 0]);
         self::assertDatabaseHas('categories', ['id' => $child31->id, 'lft' => 11, 'rgt' => 12, 'depth' => 1]);
 
-        $target->update(['parent_id' => $child11->id]);
+        $target->update(['parent_id' => $child11->id, 'name' => '1.1.1']);
 
         self::assertDatabaseHas('categories', ['id' => $root1->id, 'lft' => 0, 'rgt' => 5, 'depth' => 0]);
         self::assertDatabaseHas('categories', ['id' => $child11->id, 'lft' => 1, 'rgt' => 4, 'depth' => 1]);
-        self::assertDatabaseHas('categories', ['id' => $target->id, 'lft' => 2, 'rgt' => 3, 'depth' => 2]);
+        self::assertDatabaseHas('categories', ['id' => $target->id, 'lft' => 2, 'rgt' => 3, 'depth' => 2, 'name' => '1.1.1']);
         self::assertDatabaseHas('categories', ['id' => $root2->id, 'lft' => 6, 'rgt' => 9, 'depth' => 0]);
         self::assertDatabaseHas('categories', ['id' => $child21->id, 'lft' => 7, 'rgt' => 8, 'depth' => 1]);
         self::assertDatabaseHas('categories', ['id' => $root3->id, 'lft' => 10, 'rgt' => 13, 'depth' => 0]);
@@ -109,12 +109,12 @@ class UpdateTest extends TestCase
         self::assertDatabaseHas('categories', ['id' => $root3->id, 'lft' => 10, 'rgt' => 13, 'depth' => 0]);
         self::assertDatabaseHas('categories', ['id' => $child31->id, 'lft' => 11, 'rgt' => 12, 'depth' => 1]);
 
-        $child11->update(['parent_id' => $child21->id]);
+        $child11->update(['parent_id' => $child21->id, 'name' => '2.1.1']);
 
         self::assertDatabaseHas('categories', ['id' => $root1->id, 'lft' => 0, 'rgt' => 1, 'depth' => 0]);
         self::assertDatabaseHas('categories', ['id' => $root2->id, 'lft' => 2, 'rgt' => 9, 'depth' => 0]);
         self::assertDatabaseHas('categories', ['id' => $child21->id, 'lft' => 3, 'rgt' => 8, 'depth' => 1]);
-        self::assertDatabaseHas('categories', ['id' => $child11->id, 'lft' => 4, 'rgt' => 7, 'depth' => 2]);
+        self::assertDatabaseHas('categories', ['id' => $child11->id, 'lft' => 4, 'rgt' => 7, 'depth' => 2, 'name' => '2.1.1']);
         self::assertDatabaseHas('categories', ['id' => $child111->id, 'lft' => 5, 'rgt' => 6, 'depth' => 3]);
         self::assertDatabaseHas('categories', ['id' => $root3->id, 'lft' => 10, 'rgt' => 13, 'depth' => 0]);
         self::assertDatabaseHas('categories', ['id' => $child31->id, 'lft' => 11, 'rgt' => 12, 'depth' => 1]);
@@ -143,11 +143,11 @@ class UpdateTest extends TestCase
         self::assertDatabaseHas('categories', ['id' => $root3->id, 'lft' => 10, 'rgt' => 13, 'depth' => 0]);
         self::assertDatabaseHas('categories', ['id' => $child31->id, 'lft' => 11, 'rgt' => 12, 'depth' => 1]);
 
-        $child21->update(['parent_id' => $child11->id]);
+        $child21->update(['parent_id' => $child11->id, 'name' => '1.1.1']);
 
         self::assertDatabaseHas('categories', ['id' => $root1->id, 'lft' => 0, 'rgt' => 7, 'depth' => 0]);
         self::assertDatabaseHas('categories', ['id' => $child11->id, 'lft' => 1, 'rgt' => 6, 'depth' => 1]);
-        self::assertDatabaseHas('categories', ['id' => $child21->id, 'lft' => 2, 'rgt' => 5, 'depth' => 2]);
+        self::assertDatabaseHas('categories', ['id' => $child21->id, 'lft' => 2, 'rgt' => 5, 'depth' => 2, 'name' => '1.1.1']);
         self::assertDatabaseHas('categories', ['id' => $child211->id, 'lft' => 3, 'rgt' => 4, 'depth' => 3]);
         self::assertDatabaseHas('categories', ['id' => $root2->id, 'lft' => 8, 'rgt' => 9, 'depth' => 0]);
         self::assertDatabaseHas('categories', ['id' => $root3->id, 'lft' => 10, 'rgt' => 13, 'depth' => 0]);
