@@ -3,6 +3,7 @@
 namespace Adapterap\NestedSet\Traits;
 
 use Adapterap\NestedSet\NestedSet;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Query\Expression;
 
 /**
@@ -42,6 +43,11 @@ trait Subscriber
         static::deleted(static function ($model) {
             /** @var NestedSet $model */
             $model->nestedSetAfterDelete();
+        });
+
+        static::forceDeleted(static function ($model) {
+            /** @var NestedSet $model */
+            $model->nestedSetAfterForceDelete();
         });
     }
 
@@ -107,10 +113,17 @@ trait Subscriber
      */
     protected function nestedSetAfterDelete(): void
     {
-        $this->nestedSetDriver->freshIndexesAfterDelete(
-            $this->getAttribute($this->lftName),
-            $this->getAttribute($this->rgtName)
-        );
+        if (!in_array(SoftDeletes::class, class_uses($this), true)) {
+            $this->nestedSetDriver->freshIndexesAfterForceDelete($this->getLft(), $this->getRgt());
+        }
+    }
+
+    /**
+     * Выполняемые действия после жесткого удаления модели.
+     */
+    protected function nestedSetAfterForceDelete(): void
+    {
+        $this->nestedSetDriver->freshIndexesAfterForceDelete($this->getLft(), $this->getRgt());
     }
 
     /**

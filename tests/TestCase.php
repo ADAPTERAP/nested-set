@@ -60,6 +60,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
             $table->unsignedBigInteger('lft');
             $table->unsignedBigInteger('rgt');
             $table->unsignedBigInteger('depth');
+            $table->softDeletes();
 
             $table->foreign('parent_id')
                 ->references('id')

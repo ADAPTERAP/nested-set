@@ -3,7 +3,9 @@
 namespace Adapterap\NestedSet\Drivers;
 
 use Illuminate\Database\Capsule\Manager;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Expression;
+use Illuminate\Support\Collection as SupportCollection;
 
 class MySqlDriver extends NestedSetDriver
 {
@@ -127,13 +129,33 @@ class MySqlDriver extends NestedSetDriver
     }
 
     /**
-     * Удаляет элемент с указанным идентификатором.
+     * Мягко удаляет элемент с указанным идентификатором.
      *
      * @param int|string $primary
      *
      * @return bool
      */
-    public function delete($primary): bool
+    public function softDelete($primary): bool
+    {
+        $sql = $this->getWithClauseForSoftDelete()
+            . 'UPDATE `table` t'
+            . $this->getSetClauseForSoftDelete()
+            . $this->getWhereClauseForSoftDelete();
+
+        return Manager::connection()->statement(
+            $this->prepareNestedSetSql($sql),
+            [$primary]
+        );
+    }
+
+    /**
+     * Жестко удаляет элемент с указанным идентификатором.
+     *
+     * @param int|string $primary
+     *
+     * @return bool
+     */
+    public function forceDelete($primary): bool
     {
         $sql = "
             WITH `item` AS (SELECT `lft`, `rgt` FROM `table` WHERE `id` = ?)
@@ -149,12 +171,12 @@ class MySqlDriver extends NestedSetDriver
     }
 
     /**
-     * Обновляет индексы после удаления поддерева.
+     * Обновляет индексы после жесткого удаления поддерева.
      *
      * @param int $lft
      * @param int $rgt
      */
-    public function freshIndexesAfterDelete(int $lft, int $rgt): void
+    public function freshIndexesAfterForceDelete(int $lft, int $rgt): void
     {
         $diff = $rgt - $lft + 1;
 
@@ -304,5 +326,58 @@ class MySqlDriver extends NestedSetDriver
                         AND (`lft` <= (SELECT `lft` FROM `item`) OR `rgt` >= (SELECT `rgt` FROM `newParent`))
                 )
         ';
+    }
+
+    /**
+     * Возвращает секцию WITH для мягкого удаления.
+     *
+     * @return string
+     */
+    protected function getWithClauseForSoftDelete(): string
+    {
+        return '
+            WITH
+                # Информация о рутовом элементе перемещаемого поддерева
+                `item` AS (SELECT `id`, `lft`, `rgt` FROM `table` WHERE `id` = ?),
+                # Список элементов, которые входят в перемещаемое поддерево
+                `tree` AS (SELECT `id` FROM `table` WHERE `lft` >= (SELECT `lft` FROM `item`) AND `rgt` <= (SELECT `rgt` FROM `item`)),
+                # Разница между rgt и lft. Необходима для других запросов
+                `diffBetweenRgtAndLft` AS (
+                    SELECT (SELECT `rgt` FROM `item`) - (SELECT `lft` FROM `item`) + 1 AS `diff`
+                )
+        ';
+    }
+
+    /**
+     * Возвращает секцию SET для мягкого удаления.
+     *
+     * @return string
+     */
+    protected function getSetClauseForSoftDelete(): string
+    {
+        return '
+            SET `lft` = 
+                CASE
+                    WHEN `lft` > (SELECT `rgt` FROM `item`) THEN `lft` - (SELECT `diff` FROM `diffBetweenRgtAndLft`)
+                    WHEN EXISTS(SELECT 1 FROM `tree` WHERE `tree`.`id` = `t`.`id`) THEN 0
+                    ELSE `lft`
+                END,
+                `rgt` = CASE
+                    WHEN `rgt` > (SELECT `rgt` FROM `item`) THEN `rgt` - (SELECT `diff` FROM `diffBetweenRgtAndLft`)
+                    WHEN EXISTS(SELECT 1 FROM `tree` WHERE `tree`.`id` = `t`.`id`) THEN 0
+                    ELSE `rgt`
+                END,
+                `deleted_at` = IF(EXISTS(SELECT 1 FROM tree WHERE `tree`.`id` = `t`.`id`), COALESCE(`t`.`deleted_at`, NOW()), `deleted_at`)
+        ';
+    }
+
+    /**
+     * Возвращает секцию WHERE для мягкого удаления.
+     *
+     * @return string
+     */
+    protected function getWhereClauseForSoftDelete(): string
+    {
+        return 'WHERE `lft` >= (SELECT `lft` FROM `item`) OR `rgt` >= (SELECT `rgt` FROM `item`)';
     }
 }

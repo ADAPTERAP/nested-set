@@ -19,10 +19,11 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $rgt
  * @property int $parent_id
  * @property int $depth
+ * @property Carbon|null $deleted_at
  */
 class Category extends Model
 {
-    use NestedSet, HasFactory;
+    use NestedSet, HasFactory, SoftDeletes;
 
     protected $fillable = [
         'name',

@@ -59,19 +59,40 @@ abstract class NestedSetDriver
     abstract public function rebaseSubTree(int $id, int $parentId, array $values): int;
 
     /**
-     * Удаляет элемент с указанным идентификатором.
+     * Мягко удаляет элемент с указанным идентификатором.
      *
      * @param int|string $primary
      *
      * @return bool
      */
-    abstract public function delete($primary): bool;
+    abstract public function softDelete($primary): bool;
+
+    /**
+     * Жестко удаляет элемент с указанным идентификатором.
+     *
+     * @param int|string $primary
+     *
+     * @return bool
+     */
+    abstract public function forceDelete($primary): bool;
 
     /**
      * Обновляет индексы после удаления поддерева.
      *
      * @param int $lft
      * @param int $rgt
+     *
+     * @return void
      */
-    abstract public function freshIndexesAfterDelete(int $lft, int $rgt): void;
+    abstract public function freshIndexesAfterForceDelete(int $lft, int $rgt): void;
+
+    /**
+     * Определяет, используется ли модель мягкое удаление.
+     *
+     * @return bool
+     */
+    protected function hasSoftDeletes(): bool
+    {
+        return in_array(SoftDeletes::class, class_uses($this->model), true);
+    }
 }

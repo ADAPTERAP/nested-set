@@ -3,6 +3,8 @@
 namespace Adapterap\NestedSet;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class NestedSetBuilder extends Builder
 {
@@ -15,8 +17,15 @@ class NestedSetBuilder extends Builder
      */
     public function update(array $values): int
     {
-        /** @var NestedSet $model */
+        /** @var NestedSet|Model|SoftDeletes $model */
         $model = $this->getModel();
+
+        if (in_array(SoftDeletes::class, class_uses($model), true)) {
+            $deletedAtName = $model->getDeletedAtColumn();
+            if (!empty($values[$deletedAtName])) {
+                return (int)$this->delete();
+            }
+        }
 
         return $model->nestedSetDriver->rebaseSubTree(
             $model->getOriginal($model->getKeyName()) ?? $model->getKey(),
@@ -35,8 +44,23 @@ class NestedSetBuilder extends Builder
         /** @var NestedSet $model */
         $model = $this->getModel();
 
-        return $model->nestedSetDriver->delete(
-            $model->getAttribute($model->getKeyName())
-        );
+        if (in_array(SoftDeletes::class, class_uses($model), true)) {
+            return $model->nestedSetDriver->softDelete($model->getKey());
+        }
+
+        return $this->forceDelete();
+    }
+
+    /**
+     * Delete records from the database.
+     *
+     * @return bool
+     */
+    public function forceDelete(): bool
+    {
+        /** @var NestedSet $model */
+        $model = $this->getModel();
+
+        return $model->nestedSetDriver->forceDelete($model->getKey());
     }
 }
