@@ -3,7 +3,7 @@
     "description": "Библиотека для работы с деревьями в БД",
     "type": "library",
     "license": "MIT",
-    "version": "1.0.5",
+    "version": "1.0.6",
     "minimum-stability": "dev",
     "prefer-stable": true,
     "authors": [
@@ -31,5 +31,9 @@
         "psr-4": {
             "Adapterap\\NestedSet\\Tests\\": "tests/"
         }
+    },
+    "support": {
+        "issues": "https://github.com/ADAPTERAP/nested-set/issues",
+        "source": "https://github.com/ADAPTERAP/nested-set"
     }
 }

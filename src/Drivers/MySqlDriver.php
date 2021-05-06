@@ -2,7 +2,7 @@
 
 namespace Adapterap\NestedSet\Drivers;
 
-use Illuminate\Database\Capsule\Manager;
+use Carbon\Carbon;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Collection as SupportCollection;
@@ -28,7 +28,7 @@ class MySqlDriver extends NestedSetDriver
                 WHERE (`rgt` >= ? AND `id` != ?) OR `lft` > ?
         ";
 
-        Manager::table($this->model->getTable())
+        $this->model
             ->getConnection()
             ->statement($this->prepareNestedSetSql($sql), [$lft, $lft, $primary, $lft, $primary, $lft]);
     }
@@ -122,7 +122,7 @@ class MySqlDriver extends NestedSetDriver
 
         $sql .= $this->getWhereClauseForRebaseSubTree();
 
-        return (int)Manager::connection()->statement(
+        return (int)$this->model->getConnection()->statement(
             $this->prepareNestedSetSql($sql),
             $bindings
         );
@@ -142,7 +142,7 @@ class MySqlDriver extends NestedSetDriver
             . $this->getSetClauseForSoftDelete()
             . $this->getWhereClauseForSoftDelete();
 
-        return Manager::connection()->statement(
+        return $this->model->getConnection()->statement(
             $this->prepareNestedSetSql($sql),
             [$primary]
         );
@@ -164,7 +164,7 @@ class MySqlDriver extends NestedSetDriver
             WHERE `lft` >= (SELECT `lft` FROM `item`) AND `rgt` <= (SELECT `rgt` FROM `item`);
         ";
 
-        return Manager::connection()->statement(
+        return $this->model->getConnection()->statement(
             $this->prepareNestedSetSql($sql),
             [$primary]
         );
@@ -187,7 +187,7 @@ class MySqlDriver extends NestedSetDriver
             WHERE `lft` > ? OR `rgt` > ?
         ";
 
-        Manager::connection()->statement(
+        $this->model->getConnection()->statement(
             $this->prepareNestedSetSql($sql),
             [$rgt, $diff, $rgt, $diff, $rgt, $rgt]
         );
@@ -204,12 +204,14 @@ class MySqlDriver extends NestedSetDriver
      */
     public function upsert(array $preparedValues, array $uniqueBy, array $update = null): SupportCollection
     {
-        Manager::connection()
-            ->table($this->model->getTable())
-            ->upsert(array_values($preparedValues), $uniqueBy, $update);
+        $chunks = array_chunk($preparedValues, 7000);
+        foreach ($chunks as $chunk) {
+            $this->model
+                ->newQuery()
+                ->upsert($chunk, $uniqueBy, $update);
+        }
 
-        $builder = Manager::connection()
-            ->table($this->model->getTable());
+        $builder = $this->model->newQuery();
 
         foreach ($preparedValues as $item) {
             $builder->orWhere(function ($builder) use ($item) {
@@ -241,10 +243,20 @@ class MySqlDriver extends NestedSetDriver
      */
     public function deleteUnusedItems(array $usedPrimaries): void
     {
-        $this->model
-            ->newQuery()
-            ->whereNotIn($this->model->getKeyName(), $usedPrimaries)
-            ->delete();
+        if ($this->hasSoftDeletes()) {
+            $this->model->getConnection()
+                ->table($this->model->getTable())
+                ->whereNotIn($this->model->getKeyName(), $usedPrimaries)
+                ->whereNull($this->model->getDeletedAtColumn())
+                ->update([
+                    $this->model->getDeletedAtColumn() => Carbon::now(),
+                ]);
+        } else {
+            $this->model->getConnection()
+                ->table($this->model->getTable())
+                ->whereNotIn($this->model->getKeyName(), $usedPrimaries)
+                ->delete();
+        }
     }
 
     /**

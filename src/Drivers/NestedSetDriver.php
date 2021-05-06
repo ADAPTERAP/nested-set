@@ -87,16 +87,6 @@ abstract class NestedSetDriver
     abstract public function freshIndexesAfterForceDelete(int $lft, int $rgt): void;
 
     /**
-     * Определяет, используется ли модель мягкое удаление.
-     *
-     * @return bool
-     */
-    protected function hasSoftDeletes(): bool
-    {
-        return in_array(SoftDeletes::class, class_uses($this->model), true);
-    }
-
-    /**
      * Insert new records or update the existing ones.
      *
      * @param array $preparedValues
@@ -115,4 +105,14 @@ abstract class NestedSetDriver
      * @return void
      */
     abstract public function deleteUnusedItems(array $usedPrimaries): void;
+
+    /**
+     * Определяет, используется ли модель мягкое удаление.
+     *
+     * @return bool
+     */
+    protected function hasSoftDeletes(): bool
+    {
+        return in_array(SoftDeletes::class, class_uses($this->model), true);
+    }
 }
