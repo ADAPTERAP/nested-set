@@ -2,7 +2,7 @@
 
 namespace Adapterap\NestedSet\Relations;
 
-use Adapterap\NestedSet\NestedSet;
+use Adapterap\NestedSet\NestedSetModel;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -11,14 +11,14 @@ use Illuminate\Database\Eloquent\Model;
  * Class SiblingsRelation
  *
  * @package Adapterap\NestedSet\Relations
- * @property-read Model|NestedSet $parent
+ * @property-read Model|NestedSetModel $parent
  */
 class SiblingsRelation extends BaseRelation
 {
     /**
      * Match the eagerly loaded results to their parents.
      *
-     * @param Model[]|NestedSet[] $models
+     * @param Model[]|NestedSetModel[] $models
      * @param Collection $results
      * @param string $relation
      *
@@ -34,7 +34,7 @@ class SiblingsRelation extends BaseRelation
                 $relation,
                 $results
                     ->filter(function ($potentialSibling) use ($modelParentId) {
-                        /** @var NestedSet $potentialSibling */
+                        /** @var NestedSetModel $potentialSibling */
                         $potentialSiblingParentId = $potentialSibling->getParentId();
 
                         return $potentialSiblingParentId === $modelParentId;
@@ -50,7 +50,7 @@ class SiblingsRelation extends BaseRelation
      * Добавляет фильтры к указанному билдеру для указанной модели.
      *
      * @param Builder $builder
-     * @param Model|NestedSet $model
+     * @param Model|NestedSetModel $model
      *
      * @return Builder
      */

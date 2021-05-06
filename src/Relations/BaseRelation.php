@@ -2,7 +2,7 @@
 
 namespace Adapterap\NestedSet\Relations;
 
-use Adapterap\NestedSet\NestedSet;
+use Adapterap\NestedSet\NestedSetModel;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
  * Class BaseRelation
  *
  * @package Adapterap\NestedSet\Relations
- * @property-read Model|NestedSet $parent
+ * @property-read Model|NestedSetModel $parent
  */
 abstract class BaseRelation extends Relation
 {
@@ -44,7 +44,7 @@ abstract class BaseRelation extends Relation
     /**
      * Set the constraints for an eager load of the relation.
      *
-     * @param Model[]|NestedSet[] $models
+     * @param Model[]|NestedSetModel[] $models
      *
      * @return void
      */
@@ -83,7 +83,7 @@ abstract class BaseRelation extends Relation
     /**
      * Match the eagerly loaded results to their parents.
      *
-     * @param Model[]|NestedSet[] $models
+     * @param Model[]|NestedSetModel[] $models
      * @param Collection $results
      * @param string $relation
      *
@@ -94,7 +94,7 @@ abstract class BaseRelation extends Relation
     /**
      * Get the results of the relationship.
      *
-     * @return Collection|Model[]|NestedSet[]
+     * @return Collection|Model[]|NestedSetModel[]
      */
     public function getResults(): Collection
     {
@@ -109,7 +109,7 @@ abstract class BaseRelation extends Relation
      * Добавляет фильтры к указанному билдеру для указанной модели.
      *
      * @param Builder $builder
-     * @param Model|NestedSet $model
+     * @param Model|NestedSetModel $model
      *
      * @return Builder
      */

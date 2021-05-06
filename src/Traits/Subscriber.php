@@ -2,7 +2,7 @@
 
 namespace Adapterap\NestedSet\Traits;
 
-use Adapterap\NestedSet\NestedSet;
+use Adapterap\NestedSet\NestedSetModel;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Query\Expression;
 
@@ -10,7 +10,7 @@ use Illuminate\Database\Query\Expression;
  * Trait Subscriber
  *
  * @package Adapterap\NestedSet\Traits
- * @mixin NestedSet
+ * @mixin NestedSetModel
  */
 trait Subscriber
 {
@@ -20,34 +20,34 @@ trait Subscriber
     public static function bootSubscriber(): void
     {
         static::creating(function ($model) {
-            /** @var NestedSet $model */
+            /** @var NestedSetModel $model */
             $model->nestedSetBeforeCreate();
         });
 
         static::created(static function ($model) {
-            /** @var NestedSet $model */
+            /** @var NestedSetModel $model */
             $model->nestedSetAfterCreate();
         });
 
         static::updating(static function ($model) {
-            /** @var NestedSet $model */
+            /** @var NestedSetModel $model */
             $model->nestedSetBeforeUpdate();
         });
 
         static::deleting(static function ($model) {
-            /** @var NestedSet $model */
+            /** @var NestedSetModel $model */
             $model->refresh();
             $model->nestedSetBeforeDelete();
         });
 
         static::deleted(static function ($model) {
-            /** @var NestedSet $model */
+            /** @var NestedSetModel $model */
             $model->nestedSetAfterDelete();
         });
 
         if (method_exists(static::class, 'forceDeleted')) {
             static::forceDeleted(static function ($model) {
-                /** @var NestedSet $model */
+                /** @var NestedSetModel $model */
                 $model->nestedSetAfterForceDelete();
             });
         }
@@ -135,11 +135,11 @@ trait Subscriber
      */
     protected function nestedSetHasExpressionInAttributes(): bool
     {
-        if ($this->getLft() instanceof Expression) {
+        if (($this->attributes[$this->getLftName()] ?? null) instanceof Expression) {
             return true;
         }
 
-        if ($this->getRgt() instanceof Expression) {
+        if (($this->attributes[$this->getRgtName()] ?? null) instanceof Expression) {
             return true;
         }
 

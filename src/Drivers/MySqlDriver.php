@@ -2,6 +2,7 @@
 
 namespace Adapterap\NestedSet\Drivers;
 
+use Adapterap\NestedSet\Support\NestedSetQuery;
 use Carbon\Carbon;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Expression;
@@ -30,7 +31,10 @@ class MySqlDriver extends NestedSetDriver
 
         $this->model
             ->getConnection()
-            ->statement($this->prepareNestedSetSql($sql), [$lft, $lft, $primary, $lft, $primary, $lft]);
+            ->statement(
+                NestedSetQuery::prepare($sql, $this->model),
+                [$lft, $lft, $primary, $lft, $primary, $lft]
+            );
     }
 
     /**
@@ -50,14 +54,16 @@ class MySqlDriver extends NestedSetDriver
 
         if ($parentId === null) {
             $attributes[$this->model->getLftName()] = new Expression(
-                $this->prepareNestedSetSql(
-                    "(SELECT `max` + 1 FROM (SELECT COALESCE(MAX(`rgt`), -1) AS `max` FROM `table` WHERE `parent_id` IS NULL) t)"
+                NestedSetQuery::prepare(
+                    "(SELECT `max` + 1 FROM (SELECT COALESCE(MAX(`rgt`), -1) AS `max` FROM `table` WHERE `parent_id` IS NULL) t)",
+                    $this->model
                 )
             );
 
             $attributes[$this->model->getRgtName()] = new Expression(
-                $this->prepareNestedSetSql(
-                    "(SELECT `max` + 2 FROM (SELECT COALESCE(MAX(`rgt`), -1) AS `max` FROM `table` WHERE `parent_id` IS NULL) t)"
+                NestedSetQuery::prepare(
+                    "(SELECT `max` + 2 FROM (SELECT COALESCE(MAX(`rgt`), -1) AS `max` FROM `table` WHERE `parent_id` IS NULL) t)",
+                    $this->model
                 )
             );
 
@@ -67,20 +73,23 @@ class MySqlDriver extends NestedSetDriver
         }
 
         $attributes[$this->model->getLftName()] = new Expression(
-            $this->prepareNestedSetSql(
-                "(SELECT `rgt` FROM (SELECT `rgt` FROM `table` WHERE `id` = {$parentId}) t)"
+            NestedSetQuery::prepare(
+                "(SELECT `rgt` FROM (SELECT `rgt` FROM `table` WHERE `id` = {$parentId}) t)",
+                $this->model
             )
         );
 
         $attributes[$this->model->getRgtName()] = new Expression(
-            $this->prepareNestedSetSql(
-                "(SELECT `rgt` + 1 FROM (SELECT `rgt` FROM `table` WHERE `id` = {$parentId}) t)"
+            NestedSetQuery::prepare(
+                "(SELECT `rgt` + 1 FROM (SELECT `rgt` FROM `table` WHERE `id` = {$parentId}) t)",
+                $this->model
             )
         );
 
         $attributes[$this->model->getDepthName()] = new Expression(
-            $this->prepareNestedSetSql(
-                "(SELECT `depth` + 1 FROM (SELECT `depth` FROM `table` WHERE `id` = {$parentId}) t)"
+            NestedSetQuery::prepare(
+                "(SELECT `depth` + 1 FROM (SELECT `depth` FROM `table` WHERE `id` = {$parentId}) t)",
+                $this->model
             )
         );
 
@@ -123,7 +132,7 @@ class MySqlDriver extends NestedSetDriver
         $sql .= $this->getWhereClauseForRebaseSubTree();
 
         return (int)$this->model->getConnection()->statement(
-            $this->prepareNestedSetSql($sql),
+            NestedSetQuery::prepare($sql, $this->model),
             $bindings
         );
     }
@@ -143,7 +152,7 @@ class MySqlDriver extends NestedSetDriver
             . $this->getWhereClauseForSoftDelete();
 
         return $this->model->getConnection()->statement(
-            $this->prepareNestedSetSql($sql),
+            NestedSetQuery::prepare($sql, $this->model),
             [$primary]
         );
     }
@@ -165,7 +174,7 @@ class MySqlDriver extends NestedSetDriver
         ";
 
         return $this->model->getConnection()->statement(
-            $this->prepareNestedSetSql($sql),
+            NestedSetQuery::prepare($sql, $this->model),
             [$primary]
         );
     }
@@ -188,7 +197,7 @@ class MySqlDriver extends NestedSetDriver
         ";
 
         $this->model->getConnection()->statement(
-            $this->prepareNestedSetSql($sql),
+            NestedSetQuery::prepare($sql, $this->model),
             [$rgt, $diff, $rgt, $diff, $rgt, $rgt]
         );
     }
@@ -243,7 +252,7 @@ class MySqlDriver extends NestedSetDriver
      */
     public function deleteUnusedItems(array $usedPrimaries): void
     {
-        if ($this->hasSoftDeletes()) {
+        if ($this->model->nestedSetHasSoftDeletes()) {
             $this->model->getConnection()
                 ->table($this->model->getTable())
                 ->whereNotIn($this->model->getKeyName(), $usedPrimaries)
@@ -257,30 +266,6 @@ class MySqlDriver extends NestedSetDriver
                 ->whereNotIn($this->model->getKeyName(), $usedPrimaries)
                 ->delete();
         }
-    }
-
-    /**
-     * Подготавливает SQL запрос.
-     *
-     * @param string $sql
-     *
-     * @return string
-     */
-    protected function prepareNestedSetSql(string $sql): string
-    {
-        return str_replace(
-            ['`lft`', '`rgt`', '`parent_id`', '`depth`', '`id`', '`table`', '`deleted_at`'],
-            [
-                "`{$this->model->getLftName()}`",
-                "`{$this->model->getRgtName()}`",
-                "`{$this->model->getParentIdName()}`",
-                "`{$this->model->getDepthName()}`",
-                "`{$this->model->getKeyName()}`",
-                "`{$this->model->getTable()}`",
-                "`{$this->model->getDeletedAtColumn()}`",
-            ],
-            $sql
-        );
     }
 
     /**

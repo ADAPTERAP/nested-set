@@ -3,7 +3,7 @@
     "description": "Библиотека для работы с деревьями в БД",
     "type": "library",
     "license": "MIT",
-    "version": "1.0.7",
+    "version": "1.0.8",
     "minimum-stability": "dev",
     "prefer-stable": true,
     "authors": [

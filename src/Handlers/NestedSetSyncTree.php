@@ -1,10 +1,11 @@
 <?php
 
-namespace Adapterap\NestedSet\Support;
+namespace Adapterap\NestedSet\Handlers;
 
-use Adapterap\NestedSet\NestedSet;
+use Adapterap\NestedSet\NestedSetModel;
 use Closure;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use stdClass;
@@ -21,7 +22,7 @@ class NestedSetSyncTree
     /**
      * Пустая модель. Необходима для получения названий колонок.
      *
-     * @var Model|NestedSet
+     * @var Model|NestedSetModel|SoftDeletes
      */
     protected Model $stub;
 
@@ -65,7 +66,7 @@ class NestedSetSyncTree
     /**
      * NestedSetSyncTree constructor.
      *
-     * @param Model|NestedSet $model
+     * @param Model|NestedSetModel $model
      * @param Closure|null $map
      * @param array $uniqueBy
      * @param array|null $update
@@ -187,6 +188,11 @@ class NestedSetSyncTree
             $item[$this->stub->getRgtName()] = $lft + $this->getCountDescendants($item) * 2 + 1;
             $item[$this->stub->getDepthName()] = $depth;
             $item[$this->stub->getParentIdName()] = $parentId;
+
+            // Восстанавливаем раннее удаленные модели.
+            if ($this->stub->nestedSetHasSoftDeletes()) {
+                $item[$this->stub->getDeletedAtColumn()] = null;
+            }
 
             $uniqueKey = $this->getUniqueKeyForItem($item);
 

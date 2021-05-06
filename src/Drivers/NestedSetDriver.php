@@ -2,7 +2,7 @@
 
 namespace Adapterap\NestedSet\Drivers;
 
-use Adapterap\NestedSet\NestedSet;
+use Adapterap\NestedSet\NestedSetModel;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Collection as SupportCollection;
@@ -12,7 +12,7 @@ abstract class NestedSetDriver
     /**
      * Экземпляр модели, которая содержит имена полей.
      *
-     * @var Model|NestedSet|SoftDeletes
+     * @var Model|NestedSetModel|SoftDeletes
      */
     protected Model $model;
 
@@ -105,14 +105,4 @@ abstract class NestedSetDriver
      * @return void
      */
     abstract public function deleteUnusedItems(array $usedPrimaries): void;
-
-    /**
-     * Определяет, используется ли модель мягкое удаление.
-     *
-     * @return bool
-     */
-    protected function hasSoftDeletes(): bool
-    {
-        return in_array(SoftDeletes::class, class_uses($this->model), true);
-    }
 }

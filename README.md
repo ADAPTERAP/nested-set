@@ -22,10 +22,10 @@ composer require adapterap/nested-set
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Adapterap\NestedSet\NestedSet;
+use Adapterap\NestedSet\NestedSetModel;
 
 class Category extends Model {
-    use NestedSet;
+    use NestedSetModel;
     
     /**
      * Название колонки с индексом вложенности слева.

@@ -2,15 +2,18 @@
 
 namespace Adapterap\NestedSet;
 
+use Adapterap\NestedSet\Builders\NestedSetBuilder;
 use Adapterap\NestedSet\Drivers\MySqlDriver;
 use Adapterap\NestedSet\Drivers\NestedSetDriver;
 use Adapterap\NestedSet\Exceptions\NestedSetDriverNotSupported;
 use Adapterap\NestedSet\Traits\Attributes;
 use Adapterap\NestedSet\Traits\Relations;
+use Adapterap\NestedSet\Traits\Scopes;
 use Adapterap\NestedSet\Traits\Subscriber;
 use Adapterap\NestedSet\Traits\Tree;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Trait NestedSet
@@ -18,9 +21,9 @@ use Illuminate\Database\Eloquent\Model;
  * @package Adapterap\NestedSet
  * @mixin Model
  */
-trait NestedSet
+trait NestedSetModel
 {
-    use Attributes, Subscriber, Relations, Tree;
+    use Attributes, Subscriber, Relations, Tree, Scopes;
 
     /**
      * Свойство, меняющее поведение builder при перемещении поддерева.
@@ -39,12 +42,12 @@ trait NestedSet
     /**
      * Инициализация трейта.
      */
-    protected function initializeNestedSet(): void
+    protected function initializeNestedSetModel(): void
     {
         $connectionDriverName = $this->getConnection()->getDriverName();
 
         if ($connectionDriverName === 'mysql') {
-            /** @var Model|NestedSet $this */
+            /** @var Model|NestedSetModel $this */
             $this->nestedSetDriver = new MySqlDriver($this);
         } else {
             throw new NestedSetDriverNotSupported($connectionDriverName);
@@ -63,7 +66,7 @@ trait NestedSet
         // При обновлении элемента, следует обновлять все поддерево, а не только сам элемент.
         // При удалении элемента также следует удалять все поддерево.
         if ($this->nestedSetNeedToSubstituteBuilder) {
-            /** @var Model|NestedSet $this */
+            /** @var Model|NestedSetModel $this */
             $nestedSetBuilder = new NestedSetBuilder($query->getQuery());
             $nestedSetBuilder->setModel($this);
 
@@ -73,5 +76,15 @@ trait NestedSet
         }
 
         return parent::setKeysForSaveQuery($query);
+    }
+
+    /**
+     * Определяет, используется ли модель мягкое удаление.
+     *
+     * @return bool
+     */
+    public function nestedSetHasSoftDeletes(): bool
+    {
+        return in_array(SoftDeletes::class, class_uses($this), true);
     }
 }

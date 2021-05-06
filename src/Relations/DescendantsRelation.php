@@ -2,7 +2,7 @@
 
 namespace Adapterap\NestedSet\Relations;
 
-use Adapterap\NestedSet\NestedSet;
+use Adapterap\NestedSet\NestedSetModel;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -12,14 +12,14 @@ use Illuminate\Database\Query\Expression;
  * Class DescendantsRelation
  *
  * @package Adapterap\NestedSet\Relations
- * @property-read Model|NestedSet $parent
+ * @property-read Model|NestedSetModel $parent
  */
 class DescendantsRelation extends BaseRelation
 {
     /**
      * Match the eagerly loaded results to their parents.
      *
-     * @param Model[]|NestedSet[] $models
+     * @param Model[]|NestedSetModel[] $models
      * @param Collection $results
      * @param string $relation
      *
@@ -35,7 +35,7 @@ class DescendantsRelation extends BaseRelation
                 $relation,
                 $results
                     ->filter(function ($item) use ($descendantIds) {
-                        /** @var NestedSet $item */
+                        /** @var NestedSetModel $item */
                         $itemPrimary = $item->getAttribute($item->getKeyName());
 
                         return in_array($itemPrimary, $descendantIds, true);
@@ -51,7 +51,7 @@ class DescendantsRelation extends BaseRelation
      * Добавляет фильтры к указанному билдеру для указанной модели.
      *
      * @param Builder $builder
-     * @param Model|NestedSet $model
+     * @param Model|NestedSetModel $model
      *
      * @return Builder
      */
@@ -71,14 +71,14 @@ class DescendantsRelation extends BaseRelation
     /**
      * Возвращает массив идентификаторов потомков для указанной модели.
      *
-     * @param Model|NestedSet $model
-     * @param Collection|Model[]|NestedSet[] $relations
+     * @param Model|NestedSetModel $model
+     * @param Collection|Model[]|NestedSetModel[] $relations
      *
      * @return int[]
      */
     protected static function getDescendantIds(Model $model, Collection $relations): array
     {
-        /** @var Collection|Model[]|NestedSet[] $descendants */
+        /** @var Collection|Model[]|NestedSetModel[] $descendants */
         $descendants = clone $relations;
         $modelId = $model->getAttribute($model->getKeyName());
         $result = [];

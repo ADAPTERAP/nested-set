@@ -2,7 +2,7 @@
 
 namespace Adapterap\NestedSet\Relations;
 
-use Adapterap\NestedSet\NestedSet;
+use Adapterap\NestedSet\NestedSetModel;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -12,7 +12,7 @@ use Illuminate\Database\Query\Expression;
  * Class AncestorsRelation
  *
  * @package Adapterap\NestedSet\Relations
- * @property-read Model|NestedSet $parent
+ * @property-read Model|NestedSetModel $parent
  */
 class AncestorsRelation extends BaseRelation
 {
@@ -26,7 +26,7 @@ class AncestorsRelation extends BaseRelation
     /**
      * Match the eagerly loaded results to their parents.
      *
-     * @param Model[]|NestedSet[] $models
+     * @param Model[]|NestedSetModel[] $models
      * @param Collection $results
      * @param string $relation
      *
@@ -42,7 +42,7 @@ class AncestorsRelation extends BaseRelation
                 $relation,
                 $results
                     ->filter(function ($item) use ($ancestorIds) {
-                        /** @var NestedSet $item */
+                        /** @var NestedSetModel $item */
                         $primary = $item->getAttribute($item->getKeyName());
 
                         return in_array($primary, $ancestorIds, true);
@@ -58,7 +58,7 @@ class AncestorsRelation extends BaseRelation
      * Добавляет фильтры к указанному билдеру для указанной модели.
      *
      * @param Builder $builder
-     * @param Model|NestedSet $model
+     * @param Model|NestedSetModel $model
      *
      * @return Builder
      */
@@ -78,14 +78,14 @@ class AncestorsRelation extends BaseRelation
     /**
      * Возвращает массив идентификаторов предков для указанной модели.
      *
-     * @param Model|NestedSet $model
+     * @param Model|NestedSetModel $model
      * @param Collection $relations
      *
      * @return int[]
      */
     protected static function getAncestorIds(Model $model, Collection $relations): array
     {
-        /** @var Collection|Model[]|NestedSet[] $ancestors */
+        /** @var Collection|Model[]|NestedSetModel[] $ancestors */
         $ancestors = clone $relations;
         $result = [];
 

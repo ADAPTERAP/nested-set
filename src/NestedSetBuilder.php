@@ -4,63 +4,120 @@ namespace Adapterap\NestedSet;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
-class NestedSetBuilder extends Builder
+/**
+ * Trait NestedSetBuilder
+ *
+ * @package Adapterap\NestedSet
+ * @method NestedSetModel|Model getModel()
+ */
+trait NestedSetBuilder
 {
     /**
-     * Update records in the database.
+     * Фильтр по корневым элементам.
      *
-     * @param array $values
-     *
-     * @return int
+     * @return Builder
      */
-    public function update(array $values): int
+    public function whereDoesNotHaveParent(): Builder
     {
-        /** @var NestedSet|Model|SoftDeletes $model */
-        $model = $this->getModel();
+        /** @var Builder $this */
+        /** @var NestedSetModel $currentModel */
+        $currentModel = $this->getModel();
 
-        if (in_array(SoftDeletes::class, class_uses($model), true)) {
-            $deletedAtName = $model->getDeletedAtColumn();
-            if (!empty($values[$deletedAtName])) {
-                return (int)$this->delete();
-            }
-        }
-
-        return $model->nestedSetDriver->rebaseSubTree(
-            $model->getOriginal($model->getKeyName()) ?? $model->getKey(),
-            $model->getParentId(),
-            $values
-        );
+        return $currentModel->scopeWhereDoesNotHaveParent($this);
     }
 
     /**
-     * Delete records from the database.
+     * Фильтр по корневым элементам.
      *
-     * @return bool
+     * @return Builder
      */
-    public function delete(): bool
+    public function whereIsRoot(): Builder
     {
-        /** @var NestedSet $model */
-        $model = $this->getModel();
+        /** @var Builder $this */
+        /** @var NestedSetModel $currentModel */
+        $currentModel = $this->getModel();
 
-        if (in_array(SoftDeletes::class, class_uses($model), true)) {
-            return $model->nestedSetDriver->softDelete($model->getKey());
-        }
-
-        return $this->forceDelete();
+        return $currentModel->scopeWhereIsRoot($this);
     }
 
     /**
-     * Delete records from the database.
+     * Сортировка дерева по индексу вложенности.
      *
-     * @return bool
+     * @param string $direction
+     *
+     * @return Builder
      */
-    public function forceDelete(): bool
+    public function orderByLft(string $direction = 'asc'): Builder
     {
-        /** @var NestedSet $model */
-        $model = $this->getModel();
+        /** @var Builder $this */
+        /** @var NestedSetModel $currentModel */
+        $currentModel = $this->getModel();
 
-        return $model->nestedSetDriver->forceDelete($model->getKey());
+        return $currentModel->scopeOrderByLft($this, $direction);
+    }
+
+    /**
+     * Фильтр по дочерним элементам указанной модели.
+     *
+     * @param Model $model
+     *
+     * @return Builder
+     */
+    public function whereParent(Model $model): Builder
+    {
+        /** @var Builder $this */
+        /** @var NestedSetModel $currentModel */
+        $currentModel = $this->getModel();
+
+        return $currentModel->scopeWhereParent($this, $model);
+    }
+
+    /**
+     * Фильтр по дочерним элементам указанной модели.
+     *
+     * @param mixed $primary
+     *
+     * @return Builder
+     */
+    public function whereParentId($primary): Builder
+    {
+        /** @var Builder $this */
+        /** @var NestedSetModel $currentModel */
+        $currentModel = $this->getModel();
+
+        return $currentModel->scopeWhereParentId($this, $primary);
+    }
+
+    /**
+     * Фильтр по потомкам указанного предка.
+     *
+     * @param Model $model
+     *
+     * @return Builder
+     */
+    public function whereAncestor(Model $model): Builder
+    {
+        /** @var Builder $this */
+        /** @var NestedSetModel $currentModel */
+        $currentModel = $this->getModel();
+
+        return $currentModel->scopeWhereAncestor($this, $model);
+    }
+
+    /**
+     * Фильтр по потомкам указанного предка.
+     *
+     * @param mixed $primary
+     *
+     * @return Builder
+     */
+    public function whereAncestorId($primary): Builder
+    {
+        /** @var Builder $this */
+        /** @var NestedSetModel $currentModel */
+        $currentModel = $this->getModel();
+
+        return $currentModel->scopeWhereAncestorId($this, $primary);
     }
 }
