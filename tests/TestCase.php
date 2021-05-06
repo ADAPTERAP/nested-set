@@ -104,6 +104,16 @@ class TestCase extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * This method is called before each test.
+     */
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        Manager::table('categories')->truncate();
+    }
+
+    /**
      * Создает дерево элементов для тестирования.
      *
      * @return array

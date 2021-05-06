@@ -2,7 +2,7 @@
 
 namespace Adapterap\NestedSet\Tests\Models;
 
-use Adapterap\NestedSet\NestedSetModel;
+use Adapterap\NestedSet\NestedSetModelTrait;
 use Adapterap\NestedSet\Tests\Factories\CategoryFactory;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -25,7 +25,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class Category extends Model
 {
-    use NestedSetModel, HasFactory, SoftDeletes;
+    use NestedSetModelTrait, HasFactory, SoftDeletes;
 
     protected $fillable = [
         'name',

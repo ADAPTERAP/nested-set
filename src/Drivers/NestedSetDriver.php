@@ -2,7 +2,7 @@
 
 namespace Adapterap\NestedSet\Drivers;
 
-use Adapterap\NestedSet\NestedSetModel;
+use Adapterap\NestedSet\NestedSetModelTrait;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Collection as SupportCollection;
@@ -12,7 +12,7 @@ abstract class NestedSetDriver
     /**
      * Экземпляр модели, которая содержит имена полей.
      *
-     * @var Model|NestedSetModel|SoftDeletes
+     * @var Model|NestedSetModelTrait|SoftDeletes
      */
     protected Model $model;
 

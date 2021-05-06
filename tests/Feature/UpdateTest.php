@@ -4,20 +4,9 @@ namespace Adapterap\NestedSet\Tests\Feature;
 
 use Adapterap\NestedSet\Tests\Models\Category;
 use Adapterap\NestedSet\Tests\TestCase;
-use Illuminate\Database\Capsule\Manager as Capsule;
 
 class UpdateTest extends TestCase
 {
-    /**
-     * This method is called before each test.
-     */
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        Capsule::table('categories')->truncate();
-    }
-
     /**
      * Попытка переместить элемент вниз по дереву.
      */

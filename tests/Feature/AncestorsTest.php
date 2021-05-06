@@ -12,16 +12,6 @@ use Illuminate\Database\Eloquent\Collection;
 class AncestorsTest extends TestCase
 {
     /**
-     * This method is called before each test.
-     */
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        Capsule::table('categories')->truncate();
-    }
-
-    /**
      * Попытка получить список предков.
      */
     public function testGetViaBuilder(): void

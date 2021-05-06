@@ -9,16 +9,6 @@ use Illuminate\Database\Capsule\Manager;
 class DeleteTest extends TestCase
 {
     /**
-     * This method is called before each test.
-     */
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        Manager::table('categories')->truncate();
-    }
-
-    /**
      * Жесткое удаление одного элемента.
      */
     public function testForceDeleteSingleItem(): void

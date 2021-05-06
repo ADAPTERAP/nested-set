@@ -2,7 +2,7 @@
 
 namespace Adapterap\NestedSet\Handlers;
 
-use Adapterap\NestedSet\NestedSetModel;
+use Adapterap\NestedSet\NestedSetModelTrait;
 use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -22,7 +22,7 @@ class NestedSetSyncTree
     /**
      * Пустая модель. Необходима для получения названий колонок.
      *
-     * @var Model|NestedSetModel|SoftDeletes
+     * @var Model|NestedSetModelTrait|SoftDeletes
      */
     protected Model $stub;
 
@@ -66,10 +66,10 @@ class NestedSetSyncTree
     /**
      * NestedSetSyncTree constructor.
      *
-     * @param Model|NestedSetModel $model
-     * @param Closure|null $map
-     * @param array $uniqueBy
-     * @param array|null $update
+     * @param Model|NestedSetModelTrait $model
+     * @param Closure|null              $map
+     * @param array                     $uniqueBy
+     * @param array|null                $update
      */
     public function __construct(Model $model, ?Closure $map, array $uniqueBy, ?array $update = null)
     {

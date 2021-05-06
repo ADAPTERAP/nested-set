@@ -4,22 +4,11 @@ namespace Adapterap\NestedSet\Tests\Feature;
 
 use Adapterap\NestedSet\Tests\Models\Category;
 use Adapterap\NestedSet\Tests\TestCase;
-use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 
 class DescendantsTest extends TestCase
 {
-    /**
-     * This method is called before each test.
-     */
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        Capsule::table('categories')->truncate();
-    }
-
     /**
      * Попытка получить список потомков.
      */

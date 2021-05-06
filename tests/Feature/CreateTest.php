@@ -10,16 +10,6 @@ use Illuminate\Database\Capsule\Manager as Capsule;
 class CreateTest extends TestCase
 {
     /**
-     * This method is called before each test.
-     */
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        Capsule::table('categories')->truncate();
-    }
-
-    /**
      * Создание единственного элемента в дереве.
      */
     public function testCreateSingleRoot(): void

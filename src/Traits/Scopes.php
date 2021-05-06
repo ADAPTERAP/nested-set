@@ -2,7 +2,7 @@
 
 namespace Adapterap\NestedSet\Traits;
 
-use Adapterap\NestedSet\NestedSetModel;
+use Adapterap\NestedSet\NestedSetModelTrait;
 use Adapterap\NestedSet\Support\NestedSetQuery;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Model;
  * Trait Scopes
  *
  * @package Adapterap\NestedSet\Traits
- * @mixin NestedSetModel
+ * @mixin NestedSetModelTrait
  * @method self whereDoesNotHaveParent()
  * @method self whereIsRoot()
  * @method self orderByLft(string $direction = 'asc')
@@ -41,9 +41,9 @@ trait Scopes
      *
      * @return Builder
      */
-    public function scopeWhereIsRoot(Builder $builder, ): Builder
+    public function scopeWhereIsRoot(Builder $builder): Builder
     {
-        return $builder->whereDoesNotHaveParent();
+        return $this->scopeWhereDoesNotHaveParent($builder);
     }
 
     /**
@@ -56,7 +56,7 @@ trait Scopes
      */
     public function scopeOrderByLft(Builder $builder, string $direction = 'asc'): Builder
     {
-        return $builder->orderBy($this->getModel()->getLftName(), $direction);
+        return $builder->orderBy($this->getLftName(), $direction);
     }
 
     /**
@@ -69,7 +69,7 @@ trait Scopes
      */
     public function scopeWhereParent(Builder $builder, Model $model): Builder
     {
-        return $builder->whereParentId($model->getKeyName());
+        return $this->scopeWhereParentId($builder, $model->getKey());
     }
 
     /**
@@ -82,7 +82,7 @@ trait Scopes
      */
     public function scopeWhereParentId(Builder $builder, $id): Builder
     {
-        return $builder->where($this->getModel()->getParentIdName(), $id);
+        return $builder->where($this->getParentIdName(), $id);
     }
 
     /**
@@ -95,7 +95,7 @@ trait Scopes
      */
     public function scopeWhereAncestor(Builder $builder, Model $model): Builder
     {
-        return $builder->whereAncestorId($model->getKey());
+        return $this->scopeWhereAncestorId($builder, $model->getKey());
     }
 
     /**
@@ -111,11 +111,11 @@ trait Scopes
         /** @var Model $this */
         return $builder
             ->whereRaw(
-                NestedSetQuery::prepare('`lft` > ((SELECT `lft` FROM `table` WHERE `id` = ?))', $this),
+                NestedSetQuery::prepare('`lft` > (SELECT `lft` FROM `table` WHERE `id` = ?)', $this),
                 [$primary]
             )
             ->whereRaw(
-                NestedSetQuery::prepare('`rgt` > ((SELECT `rgt` FROM `table` WHERE `id` = ?))', $this),
+                NestedSetQuery::prepare('`rgt` < (SELECT `rgt` FROM `table` WHERE `id` = ?)', $this),
                 [$primary]
             );
     }

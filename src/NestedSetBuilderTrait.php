@@ -9,19 +9,19 @@ use Illuminate\Database\Eloquent\Model;
  * Trait NestedSetBuilder
  *
  * @package Adapterap\NestedSet
- * @method NestedSetModel|Model getModel()
+ * @method NestedSetModelTrait|Model getModel()
  */
-trait NestedSetBuilder
+trait NestedSetBuilderTrait
 {
     /**
      * Фильтр по корневым элементам.
      *
-     * @return Builder
+     * @return Builder|$this
      */
     public function whereDoesNotHaveParent(): Builder
     {
         /** @var Builder $this */
-        /** @var NestedSetModel $currentModel */
+        /** @var NestedSetModelTrait $currentModel */
         $currentModel = $this->getModel();
 
         return $currentModel->scopeWhereDoesNotHaveParent($this);
@@ -30,12 +30,12 @@ trait NestedSetBuilder
     /**
      * Фильтр по корневым элементам.
      *
-     * @return Builder
+     * @return Builder|$this
      */
     public function whereIsRoot(): Builder
     {
         /** @var Builder $this */
-        /** @var NestedSetModel $currentModel */
+        /** @var NestedSetModelTrait $currentModel */
         $currentModel = $this->getModel();
 
         return $currentModel->scopeWhereIsRoot($this);
@@ -46,12 +46,12 @@ trait NestedSetBuilder
      *
      * @param string $direction
      *
-     * @return Builder
+     * @return Builder|$this
      */
     public function orderByLft(string $direction = 'asc'): Builder
     {
         /** @var Builder $this */
-        /** @var NestedSetModel $currentModel */
+        /** @var NestedSetModelTrait $currentModel */
         $currentModel = $this->getModel();
 
         return $currentModel->scopeOrderByLft($this, $direction);
@@ -62,12 +62,12 @@ trait NestedSetBuilder
      *
      * @param Model $model
      *
-     * @return Builder
+     * @return Builder|$this
      */
     public function whereParent(Model $model): Builder
     {
         /** @var Builder $this */
-        /** @var NestedSetModel $currentModel */
+        /** @var NestedSetModelTrait $currentModel */
         $currentModel = $this->getModel();
 
         return $currentModel->scopeWhereParent($this, $model);
@@ -78,12 +78,12 @@ trait NestedSetBuilder
      *
      * @param mixed $primary
      *
-     * @return Builder
+     * @return Builder|$this
      */
     public function whereParentId($primary): Builder
     {
         /** @var Builder $this */
-        /** @var NestedSetModel $currentModel */
+        /** @var NestedSetModelTrait $currentModel */
         $currentModel = $this->getModel();
 
         return $currentModel->scopeWhereParentId($this, $primary);
@@ -94,12 +94,12 @@ trait NestedSetBuilder
      *
      * @param Model $model
      *
-     * @return Builder
+     * @return Builder|$this
      */
     public function whereAncestor(Model $model): Builder
     {
         /** @var Builder $this */
-        /** @var NestedSetModel $currentModel */
+        /** @var NestedSetModelTrait $currentModel */
         $currentModel = $this->getModel();
 
         return $currentModel->scopeWhereAncestor($this, $model);
@@ -110,12 +110,12 @@ trait NestedSetBuilder
      *
      * @param mixed $primary
      *
-     * @return Builder
+     * @return Builder|$this
      */
     public function whereAncestorId($primary): Builder
     {
         /** @var Builder $this */
-        /** @var NestedSetModel $currentModel */
+        /** @var NestedSetModelTrait $currentModel */
         $currentModel = $this->getModel();
 
         return $currentModel->scopeWhereAncestorId($this, $primary);

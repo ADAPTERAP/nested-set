@@ -2,7 +2,7 @@
 
 namespace Adapterap\NestedSet\Traits;
 
-use Adapterap\NestedSet\NestedSetModel;
+use Adapterap\NestedSet\NestedSetModelTrait;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Query\Expression;
 
@@ -10,7 +10,7 @@ use Illuminate\Database\Query\Expression;
  * Trait Subscriber
  *
  * @package Adapterap\NestedSet\Traits
- * @mixin NestedSetModel
+ * @mixin NestedSetModelTrait
  */
 trait Subscriber
 {
@@ -20,34 +20,34 @@ trait Subscriber
     public static function bootSubscriber(): void
     {
         static::creating(function ($model) {
-            /** @var NestedSetModel $model */
+            /** @var NestedSetModelTrait $model */
             $model->nestedSetBeforeCreate();
         });
 
         static::created(static function ($model) {
-            /** @var NestedSetModel $model */
+            /** @var NestedSetModelTrait $model */
             $model->nestedSetAfterCreate();
         });
 
         static::updating(static function ($model) {
-            /** @var NestedSetModel $model */
+            /** @var NestedSetModelTrait $model */
             $model->nestedSetBeforeUpdate();
         });
 
         static::deleting(static function ($model) {
-            /** @var NestedSetModel $model */
+            /** @var NestedSetModelTrait $model */
             $model->refresh();
             $model->nestedSetBeforeDelete();
         });
 
         static::deleted(static function ($model) {
-            /** @var NestedSetModel $model */
+            /** @var NestedSetModelTrait $model */
             $model->nestedSetAfterDelete();
         });
 
         if (method_exists(static::class, 'forceDeleted')) {
             static::forceDeleted(static function ($model) {
-                /** @var NestedSetModel $model */
+                /** @var NestedSetModelTrait $model */
                 $model->nestedSetAfterForceDelete();
             });
         }
