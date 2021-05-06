@@ -45,10 +45,12 @@ trait Subscriber
             $model->nestedSetAfterDelete();
         });
 
-        static::forceDeleted(static function ($model) {
-            /** @var NestedSet $model */
-            $model->nestedSetAfterForceDelete();
-        });
+        if (method_exists(static::class, 'forceDeleted')) {
+            static::forceDeleted(static function ($model) {
+                /** @var NestedSet $model */
+                $model->nestedSetAfterForceDelete();
+            });
+        }
     }
 
     /**
