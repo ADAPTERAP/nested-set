@@ -94,9 +94,30 @@ class NestedSetSyncTree
     public function sync($values): void
     {
         $values = $this->mappingValues($values);
+        $groupedValues = [];
 
-        // Создаем/обновляем дерево
-        $rawParents = $this->getValuesForUpsert($values);
+        // Группируем элементы по nestedGroupBy
+        foreach ($values as $index => $item) {
+            $parts = [];
+            foreach ($this->stub->getNestedGroupBy() as $fieldName) {
+                $parts[] = $item[$fieldName] ?? [];
+            }
+
+            $key = implode('_', $parts);
+
+            $groupedValues[$key] ??= [];
+            $groupedValues[$key][] = $item;
+            $values[$index] = null;
+        }
+
+        // Сохраняем дерево
+        $rawParents = [];
+        foreach ($groupedValues as $group) {
+            foreach ($this->getValuesForUpsert($group) as $item) {
+                $rawParents[] = $item;
+            }
+        }
+
         $this->syncChildren($this->upsert($rawParents));
 
         // Удаляем элементы, которых не было в дереве
@@ -111,7 +132,7 @@ class NestedSetSyncTree
      * Преобразует каждый элемент к нужному виду и сохраняет сгруппированные дочерние элементы для каждого родителя
      * для дальнейшего использования.
      *
-     * @param $values
+     * @param array|Collection $values
      *
      * @return array
      */
@@ -140,7 +161,7 @@ class NestedSetSyncTree
     /**
      * Синхронизирует дочерние элементы для указанных родителей.
      *
-     * @param $parents
+     * @param Collection|stdClass[] $parents
      */
     protected function syncChildren($parents): void
     {
@@ -172,9 +193,9 @@ class NestedSetSyncTree
     /**
      * Возвращает массив элементов для upsert.
      *
-     * @param array $values
-     * @param int $lft
-     * @param int $depth
+     * @param array    $values
+     * @param int      $lft
+     * @param int      $depth
      * @param int|null $parentId
      *
      * @return array
@@ -242,6 +263,10 @@ class NestedSetSyncTree
     {
         $parts = [];
         $attributes = $item instanceof Model ? $item->getAttributes() : (array)$item;
+
+        foreach ($this->stub->getNestedGroupBy() as $fieldName) {
+            $parts[] = $item[$fieldName] ?? null;
+        }
 
         if (!empty($this->uniqueBy)) {
             foreach ($this->uniqueBy as $fieldName) {

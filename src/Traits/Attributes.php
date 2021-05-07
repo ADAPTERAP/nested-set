@@ -17,41 +17,13 @@ trait Attributes
     ];
 
     /**
-     * Название колонки с индексом вложенности слева.
-     *
-     * @var string|null
-     */
-    public ?string $lftName = null;
-
-    /**
-     * Название колонки с индексом вложенности справа.
-     *
-     * @var string|null
-     */
-    public ?string $rgtName = null;
-
-    /**
-     * Название колонки с идентификатором родительской категории.
-     *
-     * @var string|null
-     */
-    public ?string $parentIdName = null;
-
-    /**
-     * Название колонки со значением глубины вложенности.
-     *
-     * @var string|null
-     */
-    public ?string $depthName = null;
-
-    /**
      * Возвращает название колонки с индексом вложенности слева.
      *
      * @return string
      */
     public function getLftName(): string
     {
-        return $this->lftName ?? Attributes::$nestedSetColumns['lft'] ?? 'lft';
+        return Attributes::$nestedSetColumns['lft'] ?? 'lft';
     }
 
     /**
@@ -61,7 +33,7 @@ trait Attributes
      */
     public function getRgtName(): string
     {
-        return $this->rgtName ?? Attributes::$nestedSetColumns['rgt'] ?? 'rgt';
+        return Attributes::$nestedSetColumns['rgt'] ?? 'rgt';
     }
 
     /**
@@ -71,7 +43,7 @@ trait Attributes
      */
     public function getDepthName(): string
     {
-        return $this->depthName ?? Attributes::$nestedSetColumns['depth'] ?? 'depth';
+        return Attributes::$nestedSetColumns['depth'] ?? 'depth';
     }
 
     /**
@@ -81,7 +53,7 @@ trait Attributes
      */
     public function getParentIdName(): string
     {
-        return $this->parentIdName ?? Attributes::$nestedSetColumns['parent_id'] ?? 'parent_id';
+        return Attributes::$nestedSetColumns['parent_id'] ?? 'parent_id';
     }
 
     /**
@@ -122,6 +94,16 @@ trait Attributes
     public function getParentId()
     {
         return $this->getAttribute($this->getParentIdName());
+    }
+
+    /**
+     * Возвращает названия полей по которым необходимо сгруппировать деревья.
+     *
+     * @return array
+     */
+    public function getNestedGroupBy(): array
+    {
+        return [];
     }
 
     /**
