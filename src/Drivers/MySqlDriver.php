@@ -6,6 +6,7 @@ use Adapterap\NestedSet\Support\NestedSetQuery;
 use Carbon\Carbon;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Expression;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as SupportCollection;
 
 class MySqlDriver extends NestedSetDriver
@@ -219,7 +220,13 @@ class MySqlDriver extends NestedSetDriver
      */
     public function upsert(array $preparedValues, array $uniqueBy, array $update = null): SupportCollection
     {
-        $chunks = array_chunk($preparedValues, 7000);
+        if (empty($preparedValues)) {
+            return new SupportCollection();
+        }
+
+        $countColumns = count(Arr::first($preparedValues) ?? []);
+
+        $chunks = array_chunk($preparedValues, ceil(48_000 / $countColumns));
         foreach ($chunks as $chunk) {
             $this->model
                 ->newQuery()
