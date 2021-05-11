@@ -5,6 +5,7 @@ namespace Adapterap\NestedSet\Drivers;
 use Adapterap\NestedSet\NestedSetModelTrait;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Collection as SupportCollection;
 
 abstract class NestedSetDriver
@@ -61,11 +62,11 @@ abstract class NestedSetDriver
     /**
      * Мягко удаляет элемент с указанным идентификатором.
      *
-     * @param int|string $primary
+     * @param Builder $builder
      *
      * @return bool
      */
-    abstract public function softDelete($primary): bool;
+    abstract public function softDelete(Builder $builder): bool;
 
     /**
      * Жестко удаляет элемент с указанным идентификатором.

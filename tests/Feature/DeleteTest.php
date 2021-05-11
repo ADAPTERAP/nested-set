@@ -32,7 +32,7 @@ class DeleteTest extends TestCase
             'child111' => $child111,
             'child1111' => $child1111,
             'child1112' => $child1112,
-        ] = $this->createTree();
+        ] = $this->createCategoryTree();
 
         $child1112->forceDelete();
 
@@ -66,7 +66,7 @@ class DeleteTest extends TestCase
             'child11' => $child11,
             'child21' => $child21,
             'child31' => $child31,
-        ] = $this->createTree();
+        ] = $this->createCategoryTree();
 
         $child11->forceDelete();
 
@@ -103,7 +103,7 @@ class DeleteTest extends TestCase
             'child111' => $child111,
             'child1111' => $child1111,
             'child1112' => $child1112,
-        ] = $this->createTree();
+        ] = $this->createCategoryTree();
 
         $child1112->delete();
 
@@ -142,7 +142,7 @@ class DeleteTest extends TestCase
             'child11' => $child11,
             'child21' => $child21,
             'child31' => $child31,
-        ] = $this->createTree();
+        ] = $this->createCategoryTree();
 
         $child11->delete();
 

@@ -2,12 +2,15 @@
 
 namespace Adapterap\NestedSet\Tests;
 
+use Adapterap\NestedSet\Handlers\NestedSetSyncTree;
+use Adapterap\NestedSet\Tests\Models\Attribute;
 use Adapterap\NestedSet\Tests\Models\Category;
 use Illuminate\Container\Container;
 use Illuminate\Database\Capsule\Manager;
 use Illuminate\Database\ConnectionResolver;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Events\Dispatcher;
+use JsonException;
 use Symfony\Component\VarDumper\VarDumper;
 
 class TestCase extends \PHPUnit\Framework\TestCase
@@ -53,8 +56,12 @@ class TestCase extends \PHPUnit\Framework\TestCase
         Category::setConnectionResolver(
             new ConnectionResolver(['default' => $manager->getConnection('default')])
         );
+        Attribute::setConnectionResolver(
+            new ConnectionResolver(['default' => $manager->getConnection('default')])
+        );
 
         $schema = Manager::schema('default');
+
         $schema->dropIfExists('categories');
         $schema->create('categories', function (Blueprint $table) {
             $table->id();
@@ -69,6 +76,25 @@ class TestCase extends \PHPUnit\Framework\TestCase
             $table->foreign('parent_id')
                 ->references('id')
                 ->on('categories')
+                ->cascadeOnDelete();
+        });
+
+        $schema->dropIfExists('attributes');
+        $schema->create('attributes', function (Blueprint $table) {
+            $table->id();
+            $table->string('name')->unique();
+            $table->unsignedBigInteger('place');
+            $table->unsignedBigInteger('parent_id')
+                ->nullable();
+            $table->unsignedBigInteger('lft');
+            $table->unsignedBigInteger('rgt');
+            $table->unsignedBigInteger('depth');
+            $table->timestamps();
+            $table->softDeletes();
+
+            $table->foreign('parent_id')
+                ->references('id')
+                ->on('attributes')
                 ->cascadeOnDelete();
         });
     }
@@ -114,11 +140,11 @@ class TestCase extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * Создает дерево элементов для тестирования.
+     * Создает дерево категорий для тестирования.
      *
      * @return array
      */
-    protected function createTree(): array
+    protected function createCategoryTree(): array
     {
         $root1 = Category::factory()->create(['name' => '1']);
         $root2 = Category::factory()->create(['name' => '2']);
@@ -143,6 +169,20 @@ class TestCase extends \PHPUnit\Framework\TestCase
             'child111',
             'child1111',
             'child1112',
+        );
+    }
+
+    /**
+     * Создает дерево атрибутов для тестирования.
+     *
+     * @return void
+     * @throws JsonException
+     */
+    protected function createAttributeTree(): void
+    {
+        $handler = new NestedSetSyncTree(new Attribute(), null, ['name'], []);
+        $handler->sync(
+            json_decode(file_get_contents(__DIR__ . '/data/attributes.json'), true, 512, JSON_THROW_ON_ERROR)
         );
     }
 }

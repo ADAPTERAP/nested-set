@@ -16,7 +16,7 @@ class MySqlDriver extends NestedSetDriver
      * - всех элементов ниже $lft
      *
      * @param mixed $primary Идентификатор созданного элемента
-     * @param int $lft Индекс вложенности слева созданного элемента
+     * @param int   $lft     Индекс вложенности слева созданного элемента
      *
      * @return void
      */
@@ -99,8 +99,8 @@ class MySqlDriver extends NestedSetDriver
     /**
      * Перемещение поддерева.
      *
-     * @param int $id
-     * @param int $parentId
+     * @param int   $id
+     * @param int   $parentId
      * @param array $values
      *
      * @return int
@@ -140,20 +140,26 @@ class MySqlDriver extends NestedSetDriver
     /**
      * Мягко удаляет элемент с указанным идентификатором.
      *
-     * @param int|string $primary
+     * @param Builder $builder
      *
      * @return bool
      */
-    public function softDelete($primary): bool
+    public function softDelete(Builder $builder): bool
     {
-        $sql = $this->getWithClauseForSoftDelete()
-            . 'UPDATE `table` t'
-            . $this->getSetClauseForSoftDelete()
-            . $this->getWhereClauseForSoftDelete();
+        $sqlPath = dirname(__DIR__, 2) . '/resources/sql/mysql/softDelete.sql';
+
+        // Добавляем фильтр по элементам, которые необходимо удалить.
+        $sql = str_replace(
+            '/* filter */',
+            $builder->clone()
+                ->select([$this->model->getKeyName(), $this->model->getLftName(), $this->model->getRgtName()])
+                ->toSql(),
+            file_get_contents($sqlPath)
+        );
 
         return $this->model->getConnection()->statement(
             NestedSetQuery::prepare($sql, $this->model),
-            [$primary]
+            $builder->getBindings()
         );
     }
 
@@ -205,8 +211,8 @@ class MySqlDriver extends NestedSetDriver
     /**
      * Insert new records or update the existing ones.
      *
-     * @param array $preparedValues
-     * @param array $uniqueBy
+     * @param array      $preparedValues
+     * @param array      $uniqueBy
      * @param array|null $update
      *
      * @return SupportCollection
@@ -377,58 +383,5 @@ class MySqlDriver extends NestedSetDriver
                         AND (`lft` <= (SELECT `lft` FROM `item`) OR `rgt` >= (SELECT `rgt` FROM `newParent`))
                 )
         ';
-    }
-
-    /**
-     * Возвращает секцию WITH для мягкого удаления.
-     *
-     * @return string
-     */
-    protected function getWithClauseForSoftDelete(): string
-    {
-        return '
-            WITH
-                # Информация о рутовом элементе перемещаемого поддерева
-                `item` AS (SELECT `id`, `lft`, `rgt` FROM `table` WHERE `id` = ?),
-                # Список элементов, которые входят в перемещаемое поддерево
-                `tree` AS (SELECT `id` FROM `table` WHERE `lft` >= (SELECT `lft` FROM `item`) AND `rgt` <= (SELECT `rgt` FROM `item`)),
-                # Разница между rgt и lft. Необходима для других запросов
-                `diffBetweenRgtAndLft` AS (
-                    SELECT (SELECT `rgt` FROM `item`) - (SELECT `lft` FROM `item`) + 1 AS `diff`
-                )
-        ';
-    }
-
-    /**
-     * Возвращает секцию SET для мягкого удаления.
-     *
-     * @return string
-     */
-    protected function getSetClauseForSoftDelete(): string
-    {
-        return '
-            SET `lft` = 
-                CASE
-                    WHEN `lft` > (SELECT `rgt` FROM `item`) THEN `lft` - (SELECT `diff` FROM `diffBetweenRgtAndLft`)
-                    WHEN EXISTS(SELECT 1 FROM `tree` WHERE `tree`.`id` = `t`.`id`) THEN 0
-                    ELSE `lft`
-                END,
-                `rgt` = CASE
-                    WHEN `rgt` > (SELECT `rgt` FROM `item`) THEN `rgt` - (SELECT `diff` FROM `diffBetweenRgtAndLft`)
-                    WHEN EXISTS(SELECT 1 FROM `tree` WHERE `tree`.`id` = `t`.`id`) THEN 0
-                    ELSE `rgt`
-                END,
-                `deleted_at` = IF(EXISTS(SELECT 1 FROM tree WHERE `tree`.`id` = `t`.`id`), COALESCE(`t`.`deleted_at`, NOW()), `deleted_at`)
-        ';
-    }
-
-    /**
-     * Возвращает секцию WHERE для мягкого удаления.
-     *
-     * @return string
-     */
-    protected function getWhereClauseForSoftDelete(): string
-    {
-        return 'WHERE `lft` >= (SELECT `lft` FROM `item`) OR `rgt` >= (SELECT `rgt` FROM `item`)';
     }
 }

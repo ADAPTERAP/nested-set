@@ -1,39 +1,40 @@
 {
-    "name": "adapterap/nested-set",
-    "description": "Библиотека для работы с деревьями в БД",
-    "type": "library",
-    "license": "MIT",
-    "version": "1.0.8",
-    "minimum-stability": "dev",
-    "prefer-stable": true,
-    "authors": [
-        {
-            "name": "lapaliv",
-            "email": "lapaliv@gmail.com"
-        }
-    ],
-    "require": {
-        "php": ">=7.4|>=8.0",
-        "illuminate/database": "^8.0",
-        "illuminate/events": "^8.0"
-    },
-    "require-dev": {
-        "phpunit/phpunit": "^9.5",
-        "fakerphp/faker": "^1.14",
-        "symfony/var-dumper": "^5.2"
-    },
-    "autoload": {
-        "psr-4": {
-            "Adapterap\\NestedSet\\": "src/"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "Adapterap\\NestedSet\\Tests\\": "tests/"
-        }
-    },
-    "support": {
-        "issues": "https://github.com/ADAPTERAP/nested-set/issues",
-        "source": "https://github.com/ADAPTERAP/nested-set"
+  "name": "adapterap/nested-set",
+  "description": "Библиотека для работы с деревьями в БД",
+  "type": "library",
+  "license": "MIT",
+  "version": "1.0.9",
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "authors": [
+    {
+      "name": "lapaliv",
+      "email": "lapaliv@gmail.com"
     }
+  ],
+  "require": {
+    "php": ">=7.4|>=8.0",
+    "illuminate/database": "^8.0",
+    "illuminate/events": "^8.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^9.5",
+    "fakerphp/faker": "^1.14",
+    "symfony/var-dumper": "^5.2",
+    "ext-json": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "Adapterap\\NestedSet\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Adapterap\\NestedSet\\Tests\\": "tests/"
+    }
+  },
+  "support": {
+    "issues": "https://github.com/ADAPTERAP/nested-set/issues",
+    "source": "https://github.com/ADAPTERAP/nested-set"
+  }
 }

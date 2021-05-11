@@ -5,9 +5,6 @@ namespace Adapterap\NestedSet\Tests\Feature;
 use Adapterap\NestedSet\Relations\AncestorsRelation;
 use Adapterap\NestedSet\Tests\Models\Category;
 use Adapterap\NestedSet\Tests\TestCase;
-use Illuminate\Database\Capsule\Manager as Capsule;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
 
 class AncestorsTest extends TestCase
 {
@@ -19,15 +16,13 @@ class AncestorsTest extends TestCase
         /** @var Category $root1 */
         /** @var Category $child11 */
         /** @var Category $child111 */
-        /** @var Category $child1111 */
         /** @var Category $child1112 */
         [
             'root1' => $root1,
             'child11' => $child11,
             'child111' => $child111,
-            'child1111' => $child1111,
             'child1112' => $child1112
-        ] = $this->createTree();
+        ] = $this->createCategoryTree();
 
         $ancestors = $child1112->ancestors()
             ->orderByDesc('lft')
@@ -51,7 +46,6 @@ class AncestorsTest extends TestCase
         /** @var Category $child21 */
         /** @var Category $child31 */
         /** @var Category $child111 */
-        /** @var Category $child1111 */
         /** @var Category $child1112 */
         [
             'root1' => $root1,
@@ -61,9 +55,8 @@ class AncestorsTest extends TestCase
             'child21' => $child21,
             'child31' => $child31,
             'child111' => $child111,
-            'child1111' => $child1111,
             'child1112' => $child1112,
-        ] = $this->createTree();
+        ] = $this->createCategoryTree();
 
         $children = (new Category())->newCollection([$child1112, $child21, $child31]);
         $children->load([
@@ -111,7 +104,7 @@ class AncestorsTest extends TestCase
             'child111' => $child111,
             'child1111' => $child1111,
             'child1112' => $child1112,
-        ] = $this->createTree();
+        ] = $this->createCategoryTree();
 
         $children = Category::query()
             ->whereRaw('rgt = lft + 1')
@@ -159,14 +152,12 @@ class AncestorsTest extends TestCase
         /** @var Category $child11 */
         /** @var Category $child111 */
         /** @var Category $child1111 */
-        /** @var Category $child1112 */
         [
             'root1' => $root1,
             'child11' => $child11,
             'child111' => $child111,
             'child1111' => $child1111,
-            'child1112' => $child1112,
-        ] = $this->createTree();
+        ] = $this->createCategoryTree();
 
         $ancestors = $child1111->ancestors;
 

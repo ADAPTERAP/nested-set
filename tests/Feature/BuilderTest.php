@@ -15,7 +15,7 @@ class BuilderTest extends TestCase
         /** @var Category $root1 */
         /** @var Category $root2 */
         /** @var Category $root3 */
-        ['root1' => $root1, 'root2' => $root2, 'root3' => $root3] = $this->createTree();
+        ['root1' => $root1, 'root2' => $root2, 'root3' => $root3] = $this->createCategoryTree();
 
         $roots = Category::query()
             ->whereDoesNotHaveParent()
@@ -35,7 +35,7 @@ class BuilderTest extends TestCase
     {
         /** @var Category $root1 */
         /** @var Category $child11 */
-        ['root1' => $root1, 'child11' => $child11] = $this->createTree();
+        ['root1' => $root1, 'child11' => $child11] = $this->createCategoryTree();
 
         $children = Category::query()
             ->whereParent($root1)
@@ -61,7 +61,7 @@ class BuilderTest extends TestCase
             'child111' => $child111,
             'child1111' => $child1111,
             'child1112' => $child1112,
-        ] = $this->createTree();
+        ] = $this->createCategoryTree();
 
         $descendants = Category::query()
             ->whereAncestor($root1)

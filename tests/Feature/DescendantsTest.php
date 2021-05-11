@@ -25,7 +25,7 @@ class DescendantsTest extends TestCase
             'child111' => $child111,
             'child1111' => $child1111,
             'child1112' => $child1112
-        ] = $this->createTree();
+        ] = $this->createCategoryTree();
 
         $descendants = $root1->descendants()
             ->orderBy('lft')
@@ -62,7 +62,7 @@ class DescendantsTest extends TestCase
             'child111' => $child111,
             'child1111' => $child1111,
             'child1112' => $child1112,
-        ] = $this->createTree();
+        ] = $this->createCategoryTree();
 
         $roots = new Collection([$root1, $root2, $root3]);
         $roots->load([
@@ -112,7 +112,7 @@ class DescendantsTest extends TestCase
             'child111' => $child111,
             'child1111' => $child1111,
             'child1112' => $child1112,
-        ] = $this->createTree();
+        ] = $this->createCategoryTree();
 
         $roots = Category::query()
             ->whereNull('parent_id')
@@ -151,7 +151,7 @@ class DescendantsTest extends TestCase
             'child111' => $child111,
             'child1111' => $child1111,
             'child1112' => $child1112,
-        ] = $this->createTree();
+        ] = $this->createCategoryTree();
 
         $descendants = $root1->descendants;
 

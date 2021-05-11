@@ -1,0 +1,128 @@
+[
+  {
+    "place": 1,
+    "name": "item 0",
+    "children": [
+      {
+        "place": 1,
+        "name": "item 0.0",
+        "children": [
+          {
+            "place": 1,
+            "name": "item 0.0.0",
+            "children": [
+              {
+                "place": 1,
+                "name": "item 0.0.0.0",
+                "children": []
+              }
+            ]
+          },
+          {
+            "place": 1,
+            "name": "item 0.0.1",
+            "children": []
+          }
+        ]
+      },
+      {
+        "place": 1,
+        "name": "item 0.1",
+        "children": [
+          {
+            "place": 1,
+            "name": "item 0.1.0",
+            "children": [
+              {
+                "place": 1,
+                "name": "item 0.1.0.0",
+                "children": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "place": 1,
+        "name": "item 0.2",
+        "children": [
+          {
+            "place": 1,
+            "name": "item 0.2.0",
+            "children": [
+              {
+                "place": 1,
+                "name": "item 0.2.0.0",
+                "children": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "place": 2,
+    "name": "item 1",
+    "children": [
+      {
+        "place": 2,
+        "name": "item 1.0",
+        "children": [
+          {
+            "place": 2,
+            "name": "item 1.0.0"
+          }
+        ]
+      },
+      {
+        "place": 2,
+        "name": "item 1.1",
+        "children": [
+          {
+            "place": 2,
+            "name": "item 1.1.0",
+            "children": [
+              {
+                "place": 2,
+                "name": "item 1.1.0.0",
+                "children": []
+              }
+            ]
+          },
+          {
+            "place": 2,
+            "name": "item 1.1.1",
+            "children": [
+              {
+                "place": 2,
+                "name": "item 1.1.1.0",
+                "children": []
+              },
+              {
+                "place": 2,
+                "name": "item 1.1.1.1",
+                "children": []
+              }
+            ]
+          },
+          {
+            "place": 2,
+            "name": "item 1.1.2",
+            "children": [
+              {
+                "place": 2,
+                "name": "item 1.1.2.0",
+                "children": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "place": 2,
+        "name": "item 1.2"
+      }
+    ]
+  }
+]
