@@ -119,4 +119,16 @@ trait Scopes
                 [$primary]
             );
     }
+
+    /**
+     * Фильтр по конечным узлам
+     *
+     * @param Builder $builder
+     *
+     * @return Builder
+     */
+    public function scopeWhereIsLeafNodes(Builder $builder): Builder
+    {
+        return $builder->whereRaw("{$this->getRgtName()} = {$this->getLftName()} + 1");
+    }
 }

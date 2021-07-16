@@ -120,4 +120,18 @@ trait NestedSetBuilderTrait
 
         return $currentModel->scopeWhereAncestorId($this, $primary);
     }
+
+    /**
+     * Фильтр по конечным узлам
+     *
+     * @return Builder
+     */
+    public function whereIsLeafNodes(): Builder
+    {
+        /** @var Builder $this */
+        /** @var NestedSetModelTrait $currentModel */
+        $currentModel = $this->getModel();
+
+        return $currentModel->scopeWhereIsLeafNodes($this);
+    }
 }
