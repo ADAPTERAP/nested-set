@@ -2,6 +2,7 @@
 
 namespace Adapterap\NestedSet\Traits;
 
+use Illuminate\Database\Eloquent\Builder;
 use Adapterap\NestedSet\Builders\NestedSetBuilder;
 use Adapterap\NestedSet\Builders\NestedSetInternalBuilder;
 use Adapterap\NestedSet\Collections\NestedSetCollection;
@@ -47,6 +48,20 @@ trait ReplaceEloquent
     public function newCollection(array $models = []): EloquentCollection
     {
         return new NestedSetCollection($models);
+    }
+
+    /**
+     * @param array $attributes
+     *
+     * @return NestedSetBuilder|Builder
+     */
+    public static function scoped(array $attributes): Builder
+    {
+        $instance = new static();
+
+        $instance->setRawAttributes($attributes);
+
+        return $instance->newScopedQuery();
     }
 
     /**

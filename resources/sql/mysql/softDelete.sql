@@ -3,6 +3,7 @@ WITH `items` AS (/* filter */),
          SELECT `t`.`id`, `t`.`lft`, `t`.`rgt`
          FROM `table` `t`
                   JOIN `items` `i` ON `t`.`lft` >= `i`.`lft` AND `t`.`rgt` <= `i`.`rgt`
+        `whereScopes`
      ),
      `deletedAts` (`id`, `deleted_at`) AS (
          SELECT `id`, NOW() FROM items
@@ -37,3 +38,4 @@ SET `lft`= CASE
                                  WHERE `dafdi`.`id` = `t`.`id`)
                        ELSE `deleted_at`
                    END
+`whereScopes`

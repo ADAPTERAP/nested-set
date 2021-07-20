@@ -47,7 +47,7 @@ class NestedSetInternalBuilder extends Builder
 
         if (in_array(SoftDeletes::class, class_uses($model), true)) {
             return $model->nestedSetDriver->softDelete(
-                $model->newQuery()
+                $model->newScopedQuery()
                     ->where($model->getKeyName(), $model->getKey())
                     ->getQuery()
             );

@@ -5,7 +5,8 @@ namespace Adapterap\NestedSet\Tests\Feature;
 use Adapterap\NestedSet\Tests\Models\Category;
 use Adapterap\NestedSet\Tests\TestCase;
 use Illuminate\Database\Capsule\Manager;
-use Illuminate\Database\Capsule\Manager as Capsule;
+use Adapterap\NestedSet\Tests\Models\MenuItem;
+use Adapterap\NestedSet\Exceptions\NestedSetCreateChildHasOtherScope;
 
 class CreateTest extends TestCase
 {
@@ -26,7 +27,7 @@ class CreateTest extends TestCase
     }
 
     /**
-     * Создание единственного элемента в дереве.
+     * Создание очернего элемента в дереве.
      */
     public function testCreateSingleChild(): void
     {
@@ -44,6 +45,67 @@ class CreateTest extends TestCase
         ]);
 
         self::assertDatabaseHas('categories', [
+            'id' => $child->id,
+            'lft' => 1,
+            'rgt' => 2,
+            'depth' => 1,
+            'parent_id' => $root->id,
+        ]);
+    }
+
+    /**
+     * Создание дочернего элемента в дереве.
+     */
+    public function testCreateSingleChildWithScope(): void
+    {
+        $root = MenuItem::factory()->create();
+        $child = MenuItem::factory()->create([
+            'parent_id' => $root->id,
+            'menu_id' => $root->menu_id,
+        ]);
+
+        self::assertDatabaseHas('menu_items', [
+            'id' => $root->id,
+            'lft' => 0,
+            'rgt' => 3,
+            'depth' => 0,
+            'parent_id' => null,
+            'menu_id' => $root->menu_id,
+        ]);
+
+        self::assertDatabaseHas('menu_items', [
+            'id' => $child->id,
+            'lft' => 1,
+            'rgt' => 2,
+            'depth' => 1,
+            'parent_id' => $root->id,
+            'menu_id' => $child->menu_id,
+        ]);
+    }
+
+    /**
+     * Создание дочеренего элемента в дереве, с разным scope
+     */
+    public function testCreateSingleChildWithDifferentScope(): void
+    {
+        $root = MenuItem::factory()->create();
+
+        self::assertDatabaseHas('menu_items', [
+            'id' => $root->id,
+            'lft' => 0,
+            'rgt' => 1,
+            'depth' => 0,
+            'parent_id' => null,
+            'menu_id' => $root->menu_id,
+        ]);
+
+        $this->expectException(NestedSetCreateChildHasOtherScope::class);
+
+        $child = MenuItem::factory()->create([
+            'parent_id' => $root->id,
+        ]);
+
+        self::assertDatabaseDoesNotHave('menu_items', [
             'id' => $child->id,
             'lft' => 1,
             'rgt' => 2,

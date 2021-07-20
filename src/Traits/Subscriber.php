@@ -5,6 +5,8 @@ namespace Adapterap\NestedSet\Traits;
 use Adapterap\NestedSet\NestedSetModelTrait;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Query\Expression;
+use Adapterap\NestedSet\Tests\Models\MenuItem;
+use Adapterap\NestedSet\Exceptions\NestedSetCreateChildHasOtherScope;
 
 /**
  * Trait Subscriber
@@ -60,6 +62,8 @@ trait Subscriber
      */
     protected function nestedSetBeforeCreate(): void
     {
+        $this->nestedSetCheckScopeBeforeSave();
+
         $this->setRawAttributes(
             $this->nestedSetDriver->getAttributesForInsert($this->getAttributes())
         );
@@ -98,6 +102,8 @@ trait Subscriber
         if (!$this->isDirty($this->getParentIdName())) {
             return;
         }
+
+        $this->nestedSetCheckScopeBeforeSave();
 
         $this->nestedSetNeedToSubstituteBuilder = true;
     }
@@ -144,5 +150,29 @@ trait Subscriber
         }
 
         return false;
+    }
+
+    /**
+     * Проверяет, что scope у root и children одинаковый
+     */
+    protected function nestedSetCheckScopeBeforeSave(): void
+    {
+        $scopes = $this->getScopeAttributes();
+
+        if ($this->is_root || empty($scopes)) {
+            return;
+        }
+
+        if ($this->parent_id !== $this->parent->id) {
+            $parent = MenuItem::query()->find($this->parent_id);
+        }
+
+        foreach ($scopes as $scope) {
+            if ($this->getAttribute($scope) === ($parent ?? $this->parent)->getAttribute($scope)) {
+                continue;
+            }
+
+            throw new NestedSetCreateChildHasOtherScope(self::class, $scope);
+        }
     }
 }

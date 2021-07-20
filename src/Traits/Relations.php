@@ -2,6 +2,7 @@
 
 namespace Adapterap\NestedSet\Traits;
 
+use Adapterap\NestedSet\NestedSetModelTrait;
 use Adapterap\NestedSet\Relations\AncestorsRelation;
 use Adapterap\NestedSet\Relations\DescendantsRelation;
 use Adapterap\NestedSet\Relations\SiblingsRelation;
@@ -49,8 +50,8 @@ trait Relations
      */
     public function descendants(): DescendantsRelation
     {
-        /** @var Model $this */
-        return new DescendantsRelation($this->newQuery(), $this);
+        /** @var NestedSetModelTrait|Model $this */
+        return new DescendantsRelation($this->newScopedQuery(), $this);
     }
 
     /**
@@ -60,8 +61,8 @@ trait Relations
      */
     public function ancestors(): AncestorsRelation
     {
-        /** @var Model $this */
-        return new AncestorsRelation($this->newQuery(), $this);
+        /** @var NestedSetModelTrait|Model $this */
+        return new AncestorsRelation($this->newScopedQuery(), $this);
     }
 
     /**
@@ -71,7 +72,7 @@ trait Relations
      */
     public function siblings(): SiblingsRelation
     {
-        /** @var Model $this */
-        return new SiblingsRelation($this->newQuery(), $this);
+        /** @var NestedSetModelTrait|Model $this */
+        return new SiblingsRelation($this->newScopedQuery(), $this);
     }
 }

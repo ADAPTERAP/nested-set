@@ -27,7 +27,7 @@ class MySqlDriver extends NestedSetDriver
             UPDATE `table`
                 SET `lft` = IF(`lft` > ?, `lft` + 2, `lft`),
                     `rgt` = IF(`rgt` >= ? AND `id` != ?, `rgt` + 2, `rgt`)
-                WHERE (`rgt` >= ? AND `id` != ?) OR `lft` > ?
+                WHERE ((`rgt` >= ? AND `id` != ?) OR `lft` > ?)`scopes`
         ";
 
         $this->model
@@ -56,14 +56,14 @@ class MySqlDriver extends NestedSetDriver
         if ($parentId === null) {
             $attributes[$this->model->getLftName()] = new Expression(
                 NestedSetQuery::prepare(
-                    "(SELECT `max` + 1 FROM (SELECT COALESCE(MAX(`rgt`), -1) AS `max` FROM `table` WHERE `parent_id` IS NULL) t)",
+                    "(SELECT `max` + 1 FROM (SELECT COALESCE(MAX(`rgt`), -1) AS `max` FROM `table` WHERE `parent_id` IS NULL`scopes`) t)",
                     $this->model
                 )
             );
 
             $attributes[$this->model->getRgtName()] = new Expression(
                 NestedSetQuery::prepare(
-                    "(SELECT `max` + 2 FROM (SELECT COALESCE(MAX(`rgt`), -1) AS `max` FROM `table` WHERE `parent_id` IS NULL) t)",
+                    "(SELECT `max` + 2 FROM (SELECT COALESCE(MAX(`rgt`), -1) AS `max` FROM `table` WHERE `parent_id` IS NULL`scopes`) t)",
                     $this->model
                 )
             );
@@ -75,24 +75,25 @@ class MySqlDriver extends NestedSetDriver
 
         $attributes[$this->model->getLftName()] = new Expression(
             NestedSetQuery::prepare(
-                "(SELECT `rgt` FROM (SELECT `rgt` FROM `table` WHERE `id` = {$parentId}) t)",
+                "(SELECT `rgt` FROM (SELECT `rgt` FROM `table` WHERE `id` = {$parentId}`scopes`) t)",
                 $this->model
             )
         );
 
         $attributes[$this->model->getRgtName()] = new Expression(
             NestedSetQuery::prepare(
-                "(SELECT `rgt` + 1 FROM (SELECT `rgt` FROM `table` WHERE `id` = {$parentId}) t)",
+                "(SELECT `rgt` + 1 FROM (SELECT `rgt` FROM `table` WHERE `id` = {$parentId}`scopes`) t)",
                 $this->model
             )
         );
 
         $attributes[$this->model->getDepthName()] = new Expression(
             NestedSetQuery::prepare(
-                "(SELECT `depth` + 1 FROM (SELECT `depth` FROM `table` WHERE `id` = {$parentId}) t)",
+                "(SELECT `depth` + 1 FROM (SELECT `depth` FROM `table` WHERE `id` = {$parentId}`scopes`) t)",
                 $this->model
             )
         );
+
 
         return $attributes;
     }
@@ -177,7 +178,7 @@ class MySqlDriver extends NestedSetDriver
             WITH `item` AS (SELECT `lft`, `rgt` FROM `table` WHERE `id` = ?)
             DELETE
             FROM `table`
-            WHERE `lft` >= (SELECT `lft` FROM `item`) AND `rgt` <= (SELECT `rgt` FROM `item`);
+            WHERE `lft` >= (SELECT `lft` FROM `item`) AND `rgt` <= (SELECT `rgt` FROM `item`)`scopes`;
         ";
 
         return $this->model->getConnection()->statement(
@@ -200,7 +201,7 @@ class MySqlDriver extends NestedSetDriver
             UPDATE `table`
             SET `lft` = IF(`lft` > ?, `lft` - ?, `lft`),
                 `rgt` = IF(`rgt` > ?, `rgt` - ?, `rgt`)
-            WHERE `lft` > ? OR `rgt` > ?
+            WHERE (`lft` > ? OR `rgt` > ?)`scopes`
         ";
 
         $this->model->getConnection()->statement(
@@ -229,11 +230,11 @@ class MySqlDriver extends NestedSetDriver
         $chunks = array_chunk($preparedValues, ceil(48_000 / $countColumns));
         foreach ($chunks as $chunk) {
             $this->model
-                ->newQuery()
+                ->newScopedQuery()
                 ->upsert($chunk, $uniqueBy, $update);
         }
 
-        $builder = $this->model->newQuery();
+        $builder = $this->model->newScopedQuery();
 
         foreach ($preparedValues as $item) {
             $builder->orWhere(function ($builder) use ($item) {
@@ -291,11 +292,11 @@ class MySqlDriver extends NestedSetDriver
         return '
             WITH 
                 # Информация о рутовом элементе перемещаемого поддерева
-                `item` AS (SELECT `id`, `lft`, `rgt`, `depth` FROM `table` WHERE `id` = ?),
+                `item` AS (SELECT `id`, `lft`, `rgt`, `depth` FROM `table` WHERE `id` = ?`scopes`),
                 # Информация о родительском элементе, внутрь которого перемещается поддерево
-                `newParent` AS (SELECT `id`, `lft`, `rgt`, `depth` FROM `table` WHERE `id` = ?),
+                `newParent` AS (SELECT `id`, `lft`, `rgt`, `depth` FROM `table` WHERE `id` = ?`scopes`),
                 # Список элементов, которые входят в перемещаемое поддерево
-                `tree` AS (SELECT `id` FROM `table` WHERE `lft` >= (SELECT `lft` FROM `item`) AND `rgt` <= (SELECT `rgt` FROM `item`)),
+                `tree` AS (SELECT `id` FROM `table` WHERE `lft` >= (SELECT `lft` FROM `item`) AND `rgt` <= (SELECT `rgt` FROM `item`)`scopes`),
                 # Разница между rgt и lft. Необходима для других запросов
                 `diffBetweenRgtAndLft` AS (
                     SELECT (SELECT `rgt` FROM `item`) - (SELECT `lft` FROM `item`) AS `diff`

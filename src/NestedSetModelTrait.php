@@ -12,9 +12,9 @@ use Adapterap\NestedSet\Traits\ReplaceEloquent;
 use Adapterap\NestedSet\Traits\Scopes;
 use Adapterap\NestedSet\Traits\Subscriber;
 use Adapterap\NestedSet\Traits\Tree;
-use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Builder;
 
 /**
  * Trait NestedSet
@@ -68,5 +68,13 @@ trait NestedSetModelTrait
     public function nestedSetHasSoftDeletes(): bool
     {
         return in_array(SoftDeletes::class, class_uses($this), true);
+    }
+
+    /**
+     * @return Builder
+     */
+    public function newScopedQuery(): Builder
+    {
+        return $this->newQuery()->prepareBuilder();
     }
 }

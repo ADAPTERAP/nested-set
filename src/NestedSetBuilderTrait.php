@@ -14,6 +14,32 @@ use Illuminate\Database\Eloquent\Model;
 trait NestedSetBuilderTrait
 {
     /**
+     * Подготавливает билдер
+     *
+     * @return Builder
+     */
+    public function prepareBuilder(): Builder
+    {
+        /** @var Builder $this */
+        /** @var NestedSetModelTrait $currentModel */
+        $currentModel = $this->getModel();
+
+        $scoped = $currentModel->getScopeAttributes();
+
+        foreach ($scoped as $attribute) {
+            $value = $currentModel->getAttributeValue($attribute);
+
+            if ($value === null) {
+                continue;
+            }
+
+            $this->where($attribute, $value);
+        }
+
+        return $this;
+    }
+
+    /**
      * Фильтр по корневым элементам.
      *
      * @return Builder|$this
@@ -24,7 +50,7 @@ trait NestedSetBuilderTrait
         /** @var NestedSetModelTrait $currentModel */
         $currentModel = $this->getModel();
 
-        return $currentModel->scopeWhereDoesNotHaveParent($this);
+        return $currentModel->scopeWhereDoesNotHaveParent($this->prepareBuilder());
     }
 
     /**
@@ -38,7 +64,7 @@ trait NestedSetBuilderTrait
         /** @var NestedSetModelTrait $currentModel */
         $currentModel = $this->getModel();
 
-        return $currentModel->scopeWhereIsRoot($this);
+        return $currentModel->scopeWhereIsRoot($this->prepareBuilder());
     }
 
     /**
@@ -54,7 +80,7 @@ trait NestedSetBuilderTrait
         /** @var NestedSetModelTrait $currentModel */
         $currentModel = $this->getModel();
 
-        return $currentModel->scopeOrderByLft($this, $direction);
+        return $currentModel->scopeOrderByLft($this->prepareBuilder(), $direction);
     }
 
     /**
@@ -70,7 +96,7 @@ trait NestedSetBuilderTrait
         /** @var NestedSetModelTrait $currentModel */
         $currentModel = $this->getModel();
 
-        return $currentModel->scopeWhereParent($this, $model);
+        return $currentModel->scopeWhereParent($this->prepareBuilder(), $model);
     }
 
     /**
@@ -86,7 +112,7 @@ trait NestedSetBuilderTrait
         /** @var NestedSetModelTrait $currentModel */
         $currentModel = $this->getModel();
 
-        return $currentModel->scopeWhereParentId($this, $primary);
+        return $currentModel->scopeWhereParentId($this->prepareBuilder(), $primary);
     }
 
     /**
@@ -102,7 +128,7 @@ trait NestedSetBuilderTrait
         /** @var NestedSetModelTrait $currentModel */
         $currentModel = $this->getModel();
 
-        return $currentModel->scopeWhereAncestor($this, $model);
+        return $currentModel->scopeWhereAncestor($this->prepareBuilder(), $model);
     }
 
     /**
@@ -118,7 +144,7 @@ trait NestedSetBuilderTrait
         /** @var NestedSetModelTrait $currentModel */
         $currentModel = $this->getModel();
 
-        return $currentModel->scopeWhereAncestorId($this, $primary);
+        return $currentModel->scopeWhereAncestorId($this->prepareBuilder(), $primary);
     }
 
     /**
@@ -132,6 +158,6 @@ trait NestedSetBuilderTrait
         /** @var NestedSetModelTrait $currentModel */
         $currentModel = $this->getModel();
 
-        return $currentModel->scopeWhereIsLeafNodes($this);
+        return $currentModel->scopeWhereIsLeafNodes($this->prepareBuilder());
     }
 }

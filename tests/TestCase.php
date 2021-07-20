@@ -2,6 +2,8 @@
 
 namespace Adapterap\NestedSet\Tests;
 
+use Adapterap\NestedSet\Tests\Models\Menu;
+use Adapterap\NestedSet\Tests\Models\MenuItem;
 use Adapterap\NestedSet\Handlers\NestedSetSyncTree;
 use Adapterap\NestedSet\Tests\Models\Attribute;
 use Adapterap\NestedSet\Tests\Models\Category;
@@ -38,7 +40,8 @@ class TestCase extends \PHPUnit\Framework\TestCase
         $manager = new Manager();
         $manager->addConnection([
             'driver' => 'mysql',
-            'host' => 'localhost',
+            'host' => 'mysqldb',
+            'port' => 3317,
             'database' => 'nested',
             'username' => 'root',
             'password' => 'password',
@@ -63,7 +66,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
         $schema = Manager::schema('default');
 
         $schema->dropIfExists('categories');
-        $schema->create('categories', function (Blueprint $table) {
+        $schema->create('categories', static function (Blueprint $table) {
             $table->id();
             $table->string('name')->unique();
             $table->unsignedBigInteger('parent_id')
@@ -80,7 +83,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
         });
 
         $schema->dropIfExists('attributes');
-        $schema->create('attributes', function (Blueprint $table) {
+        $schema->create('attributes', static function (Blueprint $table) {
             $table->id();
             $table->string('name')->unique();
             $table->unsignedBigInteger('place');
@@ -96,6 +99,52 @@ class TestCase extends \PHPUnit\Framework\TestCase
                 ->references('id')
                 ->on('attributes')
                 ->cascadeOnDelete();
+        });
+
+        $schema->disableForeignKeyConstraints();
+
+        if ($schema->hasTable('menus')) {
+            $schema->disableForeignKeyConstraints();
+            Manager::table('menus')->truncate();
+
+            $schema->drop('menus');
+            $schema->enableForeignKeyConstraints();
+        }
+
+        $schema->create('menus', static function (Blueprint $table) {
+            $table->id();
+            $table->string('name')->unique();
+        });
+
+        if ($schema->hasTable('menu_items')) {
+            $schema->disableForeignKeyConstraints();
+            Manager::table('menu_items')->truncate();
+
+            $schema->drop('menu_items');
+            $schema->enableForeignKeyConstraints();
+        }
+
+        $schema->create('menu_items', static function (Blueprint $table) {
+            $table->id();
+            $table->string('name')->unique();
+            $table->unsignedBigInteger('menu_id');
+            $table->unsignedBigInteger('parent_id')
+                  ->nullable();
+            $table->unsignedBigInteger('lft');
+            $table->unsignedBigInteger('rgt');
+            $table->unsignedBigInteger('depth');
+            $table->timestamps();
+            $table->softDeletes();
+
+            $table->foreign('parent_id')
+                  ->references('id')
+                  ->on('menu_items')
+                  ->cascadeOnDelete();
+
+            $table->foreign('menu_id')
+                  ->references('id')
+                  ->on('menus')
+                  ->cascadeOnDelete();
         });
     }
 
@@ -136,7 +185,14 @@ class TestCase extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
+        $schema = Manager::schema('default');
+        $schema->disableForeignKeyConstraints();
+
         Manager::table('categories')->truncate();
+        Manager::table('menu_items')->delete();
+        Manager::table('menus')->truncate();
+
+        $schema->enableForeignKeyConstraints();
     }
 
     /**
@@ -183,6 +239,72 @@ class TestCase extends \PHPUnit\Framework\TestCase
         $handler = new NestedSetSyncTree(new Attribute(), null, ['name'], []);
         $handler->sync(
             json_decode(file_get_contents(__DIR__ . '/data/attributes.json'), true, 512, JSON_THROW_ON_ERROR)
+        );
+    }
+
+    /**
+     * Создает дерево пунктов меню для тестирования
+     *
+     * @return array
+     */
+    protected function createMenuItemsTree(): array
+    {
+        $menu1 = Menu::factory()->create(['name' => '1']);
+        $menu2 = Menu::factory()->create(['name' => '2']);
+
+        // menu 1
+        $menu1Root1 = MenuItem::factory()->create(['menu_id' => $menu1->id, 'name' => '11']);
+        $menu1Root2 = MenuItem::factory()->create(['menu_id' => $menu1->id, 'name' => '12']);
+        $menu1Root3 = MenuItem::factory()->create(['menu_id' => $menu1->id, 'name' => '13']);
+
+        $menu1Child11 = MenuItem::factory()->create(['menu_id' => $menu1->id, 'parent_id' => $menu1Root1->id, 'name' => '11.1']);
+        $menu1Child12 = MenuItem::factory()->create(['menu_id' => $menu1->id, 'parent_id' => $menu1Root1->id, 'name' => '11.2']);
+        $menu1Child21 = MenuItem::factory()->create(['menu_id' => $menu1->id, 'parent_id' => $menu1Root2->id, 'name' => '12.1']);
+        $menu1Child31 = MenuItem::factory()->create(['menu_id' => $menu1->id, 'parent_id' => $menu1Root3->id, 'name' => '13.1']);
+
+        $menu1Child111 = MenuItem::factory()->create(['menu_id' => $menu1->id, 'parent_id' => $menu1Child11->id, 'name' => '11.1.1']);
+
+        $menu1Child1111 = MenuItem::factory()->create(['menu_id' => $menu1->id, 'parent_id' => $menu1Child111->id, 'name' => '11.1.1.1']);
+        $menu1Child1112 = MenuItem::factory()->create(['menu_id' => $menu1->id, 'parent_id' => $menu1Child111->id, 'name' => '11.1.1.2']);
+
+        // menu 2
+        $menu2Root1 = MenuItem::factory()->create(['menu_id' => $menu2->id, 'name' => '21']);
+        $menu2Root2 = MenuItem::factory()->create(['menu_id' => $menu2->id, 'name' => '22']);
+        $menu2Root3 = MenuItem::factory()->create(['menu_id' => $menu2->id, 'name' => '23']);
+
+        $menu2Child11 = MenuItem::factory()->create(['menu_id' => $menu2->id, 'parent_id' => $menu2Root1->id, 'name' => '21.1']);
+        $menu2Child12 = MenuItem::factory()->create(['menu_id' => $menu2->id, 'parent_id' => $menu2Root1->id, 'name' => '21.2']);
+        $menu2Child21 = MenuItem::factory()->create(['menu_id' => $menu2->id, 'parent_id' => $menu2Root2->id, 'name' => '22.1']);
+        $menu2Child31 = MenuItem::factory()->create(['menu_id' => $menu2->id, 'parent_id' => $menu2Root3->id, 'name' => '23.1']);
+
+        $menu2Child121 = MenuItem::factory()->create(['menu_id' => $menu2->id, 'parent_id' => $menu2Child12->id, 'name' => '21.2.1']);
+
+        $menu2Child1211 = MenuItem::factory()->create(['menu_id' => $menu2->id, 'parent_id' => $menu2Child121->id, 'name' => '21.2.1.1']);
+        $menu2Child1212 = MenuItem::factory()->create(['menu_id' => $menu2->id, 'parent_id' => $menu2Child121->id, 'name' => '21.2.1.2']);
+
+        return compact(
+            'menu1',
+            'menu2',
+            'menu1Root1',
+            'menu1Root2',
+            'menu1Root3',
+            'menu1Child11',
+            'menu1Child12',
+            'menu1Child21',
+            'menu1Child31',
+            'menu1Child111',
+            'menu1Child1111',
+            'menu1Child1112',
+            'menu2Root1',
+            'menu2Root2',
+            'menu2Root3',
+            'menu2Child11',
+            'menu2Child12',
+            'menu2Child21',
+            'menu2Child31',
+            'menu2Child121',
+            'menu2Child1211',
+            'menu2Child1212',
         );
     }
 }
