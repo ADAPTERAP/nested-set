@@ -5,7 +5,6 @@ namespace Adapterap\NestedSet\Traits;
 use Adapterap\NestedSet\NestedSetModelTrait;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Query\Expression;
-use Adapterap\NestedSet\Tests\Models\MenuItem;
 use Adapterap\NestedSet\Exceptions\NestedSetCreateChildHasOtherScope;
 
 /**
@@ -164,7 +163,7 @@ trait Subscriber
         }
 
         if ($this->parent_id !== $this->parent->id) {
-            $parent = MenuItem::query()->find($this->parent_id);
+            $parent = $this->newQuery()->find($this->parent_id);
         }
 
         foreach ($scopes as $scope) {
