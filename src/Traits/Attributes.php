@@ -23,7 +23,7 @@ trait Attributes
      */
     public function getLftName(): string
     {
-        return Attributes::$nestedSetColumns['lft'] ?? 'lft';
+        return static::$nestedSetColumns['lft'] ?? 'lft';
     }
 
     /**
@@ -33,7 +33,7 @@ trait Attributes
      */
     public function getRgtName(): string
     {
-        return Attributes::$nestedSetColumns['rgt'] ?? 'rgt';
+        return static::$nestedSetColumns['rgt'] ?? 'rgt';
     }
 
     /**
@@ -43,7 +43,7 @@ trait Attributes
      */
     public function getDepthName(): string
     {
-        return Attributes::$nestedSetColumns['depth'] ?? 'depth';
+        return static::$nestedSetColumns['depth'] ?? 'depth';
     }
 
     /**
@@ -53,7 +53,7 @@ trait Attributes
      */
     public function getParentIdName(): string
     {
-        return Attributes::$nestedSetColumns['parent_id'] ?? 'parent_id';
+        return static::$nestedSetColumns['parent_id'] ?? 'parent_id';
     }
 
     /**
