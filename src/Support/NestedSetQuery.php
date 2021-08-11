@@ -2,9 +2,10 @@
 
 namespace Adapterap\NestedSet\Support;
 
-use Illuminate\Support\Str;
-use Illuminate\Database\Eloquent\Model;
 use Adapterap\NestedSet\NestedSetModelTrait;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 
 class NestedSetQuery
 {
@@ -12,27 +13,30 @@ class NestedSetQuery
      * Подготавливает запрос к выполнению.
      *
      * @param string $query
-     * @param Model $model
+     * @param Model|NestedSetModelTrait|SoftDeletes  $model
      *
      * @return array|string|string[]
      */
     public static function prepare(string $query, Model $model)
     {
-        return str_replace(
-            ['`lft`', '`rgt`', '`parent_id`', '`depth`', '`id`', '`table`', '`deleted_at`', '`scopes`', '`whereScopes`'],
-            [
-                "`{$model->getLftName()}`",
-                "`{$model->getRgtName()}`",
-                "`{$model->getParentIdName()}`",
-                "`{$model->getDepthName()}`",
-                "`{$model->getKeyName()}`",
-                "`{$model->getTable()}`",
-                "`{$model->getDeletedAtColumn()}`",
-                self::addScopeToSql($model),
-                self::addScopeToSql($model, true),
-            ],
-            $query
-        );
+        $templateColumnNames = ['`lft`', '`rgt`', '`parent_id`', '`depth`', '`id`', '`table`', '`scopes`', '`whereScopes`'];
+        $actualColumnNames = [
+            "`{$model->getLftName()}`",
+            "`{$model->getRgtName()}`",
+            "`{$model->getParentIdName()}`",
+            "`{$model->getDepthName()}`",
+            "`{$model->getKeyName()}`",
+            "`{$model->getTable()}`",
+            self::addScopeToSql($model),
+            self::addScopeToSql($model, true),
+        ];
+
+        if ($model->nestedSetHasSoftDeletes()) {
+            $templateColumnNames[] = 'deleted_at';
+            $actualColumnNames[] = "`{$model->getDeletedAtColumn()}`";
+        }
+
+        return str_replace($templateColumnNames, $actualColumnNames, $query);
     }
 
     /**

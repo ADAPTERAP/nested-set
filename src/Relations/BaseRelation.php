@@ -114,4 +114,14 @@ abstract class BaseRelation extends Relation
      * @return Builder
      */
     abstract protected static function addFiltersForModel(Builder $builder, Model $model): Builder;
+
+    /**
+     * Get the key for comparing against the parent key in "has" query.
+     *
+     * @return string
+     */
+    public function getExistenceCompareKey(): string
+    {
+        return $this->getModel()->getKeyName();
+    }
 }

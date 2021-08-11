@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Model;
 trait NestedSetBuilderTrait
 {
     /**
-     * Подготавливает билдер
+     * Подготавливает билдер.
      *
      * @return Builder
      */
