@@ -32,7 +32,7 @@ class NestedSetQuery
         ];
 
         if ($model->nestedSetHasSoftDeletes()) {
-            $templateColumnNames[] = 'deleted_at';
+            $templateColumnNames[] = '`deleted_at`';
             $actualColumnNames[] = "`{$model->getDeletedAtColumn()}`";
         }
 
