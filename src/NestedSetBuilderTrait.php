@@ -6,10 +6,9 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Trait NestedSetBuilder
+ * Trait NestedSetBuilder.
  *
- * @package Adapterap\NestedSet
- * @method NestedSetModelTrait|Model getModel()
+ * @method Model|NestedSetModelTrait getModel()
  */
 trait NestedSetBuilderTrait
 {
@@ -42,7 +41,7 @@ trait NestedSetBuilderTrait
     /**
      * Фильтр по корневым элементам.
      *
-     * @return Builder|$this
+     * @return $this|Builder
      */
     public function whereDoesNotHaveParent(): Builder
     {
@@ -56,7 +55,7 @@ trait NestedSetBuilderTrait
     /**
      * Фильтр по корневым элементам.
      *
-     * @return Builder|$this
+     * @return $this|Builder
      */
     public function whereIsRoot(): Builder
     {
@@ -72,7 +71,7 @@ trait NestedSetBuilderTrait
      *
      * @param string $direction
      *
-     * @return Builder|$this
+     * @return $this|Builder
      */
     public function orderByLft(string $direction = 'asc'): Builder
     {
@@ -88,7 +87,7 @@ trait NestedSetBuilderTrait
      *
      * @param Model $model
      *
-     * @return Builder|$this
+     * @return $this|Builder
      */
     public function whereParent(Model $model): Builder
     {
@@ -104,7 +103,7 @@ trait NestedSetBuilderTrait
      *
      * @param mixed $primary
      *
-     * @return Builder|$this
+     * @return $this|Builder
      */
     public function whereParentId($primary): Builder
     {
@@ -120,7 +119,7 @@ trait NestedSetBuilderTrait
      *
      * @param Model $model
      *
-     * @return Builder|$this
+     * @return $this|Builder
      */
     public function whereAncestor(Model $model): Builder
     {
@@ -136,7 +135,7 @@ trait NestedSetBuilderTrait
      *
      * @param mixed $primary
      *
-     * @return Builder|$this
+     * @return $this|Builder
      */
     public function whereAncestorId($primary): Builder
     {

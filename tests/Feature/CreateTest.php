@@ -2,12 +2,16 @@
 
 namespace Adapterap\NestedSet\Tests\Feature;
 
+use Adapterap\NestedSet\Exceptions\NestedSetCreateChildHasOtherScope;
 use Adapterap\NestedSet\Tests\Models\Category;
+use Adapterap\NestedSet\Tests\Models\MenuItem;
 use Adapterap\NestedSet\Tests\TestCase;
 use Illuminate\Database\Capsule\Manager;
-use Adapterap\NestedSet\Tests\Models\MenuItem;
-use Adapterap\NestedSet\Exceptions\NestedSetCreateChildHasOtherScope;
 
+/**
+ * @internal
+ * @coversNothing
+ */
 class CreateTest extends TestCase
 {
     /**
@@ -84,7 +88,7 @@ class CreateTest extends TestCase
     }
 
     /**
-     * Создание дочеренего элемента в дереве, с разным scope
+     * Создание дочеренего элемента в дереве, с разным scope.
      */
     public function testCreateSingleChildWithDifferentScope(): void
     {

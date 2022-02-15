@@ -2,12 +2,16 @@
 
 namespace Adapterap\NestedSet\Tests\Feature;
 
-use Adapterap\NestedSet\Tests\Models\Menu;
 use Adapterap\NestedSet\Tests\Models\Category;
+use Adapterap\NestedSet\Tests\Models\Menu;
+use Adapterap\NestedSet\Tests\Models\MenuItem;
 use Adapterap\NestedSet\Tests\TestCase;
 use Illuminate\Database\Capsule\Manager;
-use Adapterap\NestedSet\Tests\Models\MenuItem;
 
+/**
+ * @internal
+ * @coversNothing
+ */
 class DeleteTest extends TestCase
 {
     /**
@@ -354,8 +358,8 @@ class DeleteTest extends TestCase
             6,
             Manager::table('menu_items')
                 ->where('menu_id', $menu1->id)
-                   ->whereNull('deleted_at')
-                   ->count()
+                ->whereNull('deleted_at')
+                ->count()
         );
 
         $this->assertDatabaseHas('menu_items', ['id' => $root1->id, 'lft' => 0, 'rgt' => 3, 'depth' => 0]);

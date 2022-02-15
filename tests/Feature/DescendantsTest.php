@@ -2,13 +2,17 @@
 
 namespace Adapterap\NestedSet\Tests\Feature;
 
-use Adapterap\NestedSet\Tests\Models\Menu;
 use Adapterap\NestedSet\Tests\Models\Category;
+use Adapterap\NestedSet\Tests\Models\Menu;
+use Adapterap\NestedSet\Tests\Models\MenuItem;
 use Adapterap\NestedSet\Tests\TestCase;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Adapterap\NestedSet\Tests\Models\MenuItem;
 
+/**
+ * @internal
+ * @coversNothing
+ */
 class DescendantsTest extends TestCase
 {
     /**
@@ -73,7 +77,7 @@ class DescendantsTest extends TestCase
     }
 
     /**
-     * Проверка корректности работы load() в коллекции
+     * Проверка корректности работы load() в коллекции.
      */
     public function testLoadFromCollection(): void
     {
@@ -103,7 +107,7 @@ class DescendantsTest extends TestCase
             'descendants' => function ($builder) {
                 /** @var Builder $builder */
                 $builder->orderBy('lft');
-            }
+            },
         ]);
 
         // root1
@@ -123,7 +127,7 @@ class DescendantsTest extends TestCase
     }
 
     /**
-     * Проверка корректности работы load() в коллекции
+     * Проверка корректности работы load() в коллекции.
      */
     public function testLoadFromCollectionWithScope(): void
     {
@@ -157,7 +161,7 @@ class DescendantsTest extends TestCase
             'descendants' => function ($builder) use ($menu1) {
                 /** @var Builder $builder */
                 $builder->where('menu_id', $menu1->id)->orderBy('lft');
-            }
+            },
         ]);
 
         // root1
@@ -178,7 +182,7 @@ class DescendantsTest extends TestCase
     }
 
     /**
-     * Проверка корректности работы with() в билдере
+     * Проверка корректности работы with() в билдере.
      */
     public function testWithInBuilder(): void
     {
@@ -219,7 +223,7 @@ class DescendantsTest extends TestCase
     }
 
     /**
-     * Проверка корректности работы with() в билдере
+     * Проверка корректности работы with() в билдере.
      */
     public function testWithInBuilderWithScope(): void
     {
@@ -267,7 +271,7 @@ class DescendantsTest extends TestCase
     }
 
     /**
-     * Проверка корректности работы lazy load
+     * Проверка корректности работы lazy load.
      */
     public function testLazyLoad(): void
     {
@@ -294,7 +298,7 @@ class DescendantsTest extends TestCase
     }
 
     /**
-     * Проверка корректности работы lazy load
+     * Проверка корректности работы lazy load.
      */
     public function testLazyLoadWithScope(): void
     {

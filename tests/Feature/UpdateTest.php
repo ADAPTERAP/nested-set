@@ -2,12 +2,16 @@
 
 namespace Adapterap\NestedSet\Tests\Feature;
 
-use Adapterap\NestedSet\Tests\Models\Menu;
-use Adapterap\NestedSet\Tests\Models\Category;
-use Adapterap\NestedSet\Tests\TestCase;
-use Adapterap\NestedSet\Tests\Models\MenuItem;
 use Adapterap\NestedSet\Exceptions\NestedSetCreateChildHasOtherScope;
+use Adapterap\NestedSet\Tests\Models\Category;
+use Adapterap\NestedSet\Tests\Models\Menu;
+use Adapterap\NestedSet\Tests\Models\MenuItem;
+use Adapterap\NestedSet\Tests\TestCase;
 
+/**
+ * @internal
+ * @coversNothing
+ */
 class UpdateTest extends TestCase
 {
     /**

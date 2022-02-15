@@ -14,6 +14,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Application;
 use JsonException;
 
+/**
+ * @internal
+ * @coversNothing
+ */
 class TestCase extends \Orchestra\Testbench\TestCase
 {
     /**
@@ -74,7 +78,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
     public function setUp(): void
     {
         $this->app = $this->createApplication();
-        $this->app->bind('db', fn() => Manager::connection('default'));
+        $this->app->bind('db', fn () => Manager::connection('default'));
 
         parent::setUp();
 
@@ -132,7 +136,6 @@ class TestCase extends \Orchestra\Testbench\TestCase
     /**
      * Создает дерево атрибутов для тестирования.
      *
-     * @return void
      * @throws JsonException
      */
     protected function createAttributeTree(): void
@@ -144,7 +147,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
     }
 
     /**
-     * Создает дерево пунктов меню для тестирования
+     * Создает дерево пунктов меню для тестирования.
      *
      * @return array
      */
@@ -214,7 +217,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
      *
      * @param Model|string $table
      * @param array        $data
-     * @param string|null  $connection
+     * @param null|string  $connection
      *
      * @return $this
      */
@@ -234,7 +237,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
      *
      * @param Model|string $table
      * @param array        $data
-     * @param string|null  $connection
+     * @param null|string  $connection
      *
      * @return $this
      */

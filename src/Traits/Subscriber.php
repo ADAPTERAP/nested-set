@@ -2,15 +2,14 @@
 
 namespace Adapterap\NestedSet\Traits;
 
+use Adapterap\NestedSet\Exceptions\NestedSetCreateChildHasOtherScope;
 use Adapterap\NestedSet\NestedSetModelTrait;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Query\Expression;
-use Adapterap\NestedSet\Exceptions\NestedSetCreateChildHasOtherScope;
 
 /**
- * Trait Subscriber
+ * Trait Subscriber.
  *
- * @package Adapterap\NestedSet\Traits
  * @mixin NestedSetModelTrait
  */
 trait Subscriber
@@ -56,8 +55,6 @@ trait Subscriber
 
     /**
      * Выполняемые действия перед созданием модели.
-     *
-     * @return void
      */
     protected function nestedSetBeforeCreate(): void
     {
@@ -70,8 +67,6 @@ trait Subscriber
 
     /**
      * Выполняемые действия после создания модели.
-     *
-     * @return void
      */
     protected function nestedSetAfterCreate(): void
     {
@@ -93,8 +88,6 @@ trait Subscriber
 
     /**
      * Выполняемые действия перед обновлением модели.
-     *
-     * @return void
      */
     protected function nestedSetBeforeUpdate(): void
     {
@@ -134,7 +127,7 @@ trait Subscriber
     }
 
     /**
-     * Определяет есть ли в атрибутах экземпляр класса Expression
+     * Определяет есть ли в атрибутах экземпляр класса Expression.
      *
      * @return bool
      */
@@ -152,7 +145,7 @@ trait Subscriber
     }
 
     /**
-     * Проверяет, что scope у root и children одинаковый
+     * Проверяет, что scope у root и children одинаковый.
      */
     protected function nestedSetCheckScopeBeforeSave(): void
     {
