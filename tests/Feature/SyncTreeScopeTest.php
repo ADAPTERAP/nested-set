@@ -3,9 +3,13 @@
 namespace Adapterap\NestedSet\Tests\Feature;
 
 use Adapterap\NestedSet\Tests\Models\Menu;
-use Adapterap\NestedSet\Tests\TestCase;
 use Adapterap\NestedSet\Tests\Models\MenuItem;
+use Adapterap\NestedSet\Tests\TestCase;
 
+/**
+ * @internal
+ * @coversNothing
+ */
 class SyncTreeScopeTest extends TestCase
 {
     /**
@@ -29,10 +33,10 @@ class SyncTreeScopeTest extends TestCase
         MenuItem::syncTree($tree, ['name'], ['name']);
         $this->asserts($tree);
 
-        self::assertDatabaseHas('menu_items', [
+        $this->assertDatabaseHas('menu_items', [
             'id' => $menuItemWillBeDelete->id,
         ]);
-        self::assertDatabaseDoesNotHave('menu_items', [
+        $this->assertDatabaseMissing('menu_items', [
             'id' => $menuItemWillBeDelete->id,
             'deleted_at' => null,
         ]);
@@ -42,15 +46,15 @@ class SyncTreeScopeTest extends TestCase
      * Рекурсивно проверяет корректность сохраненных данных в БД.
      *
      * @param array $tree
-     * @param int $lft
-     * @param int $depth
+     * @param int   $lft
+     * @param int   $depth
      */
     protected function asserts(array $tree, int $lft = 0, int $depth = 0): void
     {
         foreach ($tree as $item) {
             $rgt = $lft + $this->getCountDescendants($item) * 2 + 1;
 
-            self::assertDatabaseHas('menu_items', [
+            $this->assertDatabaseHas('menu_items', [
                 'name' => $item['name'],
                 'lft' => $lft,
                 'rgt' => $rgt,
@@ -75,6 +79,7 @@ class SyncTreeScopeTest extends TestCase
     protected function getCountDescendants(array $item): int
     {
         $count = 0;
+
         foreach ($item['children'] ?? [] as $child) {
             $count += $this->getCountDescendants($child) + 1;
         }
@@ -232,7 +237,7 @@ class SyncTreeScopeTest extends TestCase
                         ],
                     ],
                 ],
-            ]
+            ],
         ];
     }
 }

@@ -2,20 +2,18 @@
 
 namespace Adapterap\NestedSet\Traits;
 
-use Adapterap\NestedSet\NestedSetModelTrait;
 use Adapterap\NestedSet\Relations\AncestorsRelation;
 use Adapterap\NestedSet\Relations\DescendantsRelation;
 use Adapterap\NestedSet\Relations\SiblingsRelation;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
 
 /**
- * Trait Relations
+ * Trait Relations.
  *
- * @package Adapterap\NestedSet\Traits
- * @property-read $this|null $parent
+ * @property-read null|$this         $parent
  * @property-read Collection|$this[] $children
  * @property-read Collection|$this[] $descendants
  * @property-read Collection|$this[] $ancestors
@@ -50,7 +48,6 @@ trait Relations
      */
     public function descendants(): DescendantsRelation
     {
-        /** @var NestedSetModelTrait|Model $this */
         return new DescendantsRelation($this->newScopedQuery(), $this);
     }
 
@@ -61,7 +58,6 @@ trait Relations
      */
     public function ancestors(): AncestorsRelation
     {
-        /** @var NestedSetModelTrait|Model $this */
         return new AncestorsRelation($this->newScopedQuery(), $this);
     }
 
@@ -72,7 +68,11 @@ trait Relations
      */
     public function siblings(): SiblingsRelation
     {
-        /** @var NestedSetModelTrait|Model $this */
         return new SiblingsRelation($this->newScopedQuery(), $this);
     }
+
+    /**
+     * @return Builder
+     */
+    abstract public function newScopedQuery(): Builder;
 }

@@ -14,21 +14,19 @@ class MySqlDriver extends NestedSetDriver
     /**
      * Пересчитывает индексы вложенности для:
      * - всех предков $lft
-     * - всех элементов ниже $lft
+     * - всех элементов ниже $lft.
      *
      * @param mixed $primary Идентификатор созданного элемента
      * @param int   $lft     Индекс вложенности слева созданного элемента
-     *
-     * @return void
      */
     public function freshIndexesAfterInsert($primary, int $lft): void
     {
-        $sql = "
+        $sql = '
             UPDATE `table`
                 SET `lft` = IF(`lft` > ?, `lft` + 2, `lft`),
                     `rgt` = IF(`rgt` >= ? AND `id` != ?, `rgt` + 2, `rgt`)
                 WHERE ((`rgt` >= ? AND `id` != ?) OR `lft` > ?)`scopes`
-        ";
+        ';
 
         $this->model
             ->getConnection()
@@ -56,14 +54,14 @@ class MySqlDriver extends NestedSetDriver
         if ($parentId === null) {
             $attributes[$this->model->getLftName()] = new Expression(
                 NestedSetQuery::prepare(
-                    "(SELECT `max` + 1 FROM (SELECT COALESCE(MAX(`rgt`), -1) AS `max` FROM `table` WHERE `parent_id` IS NULL`scopes`) t)",
+                    '(SELECT `max` + 1 FROM (SELECT COALESCE(MAX(`rgt`), -1) AS `max` FROM `table` WHERE `parent_id` IS NULL`scopes`) t)',
                     $this->model
                 )
             );
 
             $attributes[$this->model->getRgtName()] = new Expression(
                 NestedSetQuery::prepare(
-                    "(SELECT `max` + 2 FROM (SELECT COALESCE(MAX(`rgt`), -1) AS `max` FROM `table` WHERE `parent_id` IS NULL`scopes`) t)",
+                    '(SELECT `max` + 2 FROM (SELECT COALESCE(MAX(`rgt`), -1) AS `max` FROM `table` WHERE `parent_id` IS NULL`scopes`) t)',
                     $this->model
                 )
             );
@@ -94,7 +92,6 @@ class MySqlDriver extends NestedSetDriver
             )
         );
 
-
         return $attributes;
     }
 
@@ -119,7 +116,7 @@ class MySqlDriver extends NestedSetDriver
             $this->model->getLftName(),
             $this->model->getRgtName(),
             $this->model->getParentIdName(),
-            $this->model->getDepthName()
+            $this->model->getDepthName(),
         ];
 
         foreach ($values as $field => $value) {
@@ -133,7 +130,7 @@ class MySqlDriver extends NestedSetDriver
 
         $sql .= $this->getWhereClauseForRebaseSubTree();
 
-        return (int)$this->model->getConnection()->statement(
+        return (int) $this->model->getConnection()->statement(
             NestedSetQuery::prepare($sql, $this->model),
             $bindings
         );
@@ -174,12 +171,12 @@ class MySqlDriver extends NestedSetDriver
      */
     public function forceDelete($primary): bool
     {
-        $sql = "
+        $sql = '
             WITH `item` AS (SELECT `lft`, `rgt` FROM `table` WHERE `id` = ?)
             DELETE
             FROM `table`
             WHERE `lft` >= (SELECT `lft` FROM `item`) AND `rgt` <= (SELECT `rgt` FROM `item`)`scopes`;
-        ";
+        ';
 
         return $this->model->getConnection()->statement(
             NestedSetQuery::prepare($sql, $this->model),
@@ -197,12 +194,12 @@ class MySqlDriver extends NestedSetDriver
     {
         $diff = $rgt - $lft + 1;
 
-        $sql = "
+        $sql = '
             UPDATE `table`
             SET `lft` = IF(`lft` > ?, `lft` - ?, `lft`),
                 `rgt` = IF(`rgt` > ?, `rgt` - ?, `rgt`)
             WHERE (`lft` > ? OR `rgt` > ?)`scopes`
-        ";
+        ';
 
         $this->model->getConnection()->statement(
             NestedSetQuery::prepare($sql, $this->model),
@@ -215,7 +212,7 @@ class MySqlDriver extends NestedSetDriver
      *
      * @param array      $preparedValues
      * @param array      $uniqueBy
-     * @param array|null $update
+     * @param null|array $update
      *
      * @return SupportCollection
      */
@@ -228,6 +225,7 @@ class MySqlDriver extends NestedSetDriver
         $countColumns = count(Arr::first($preparedValues) ?? []);
 
         $chunks = array_chunk($preparedValues, ceil(48_000 / $countColumns));
+
         foreach ($chunks as $chunk) {
             $this->model
                 ->newScopedQuery()
@@ -261,8 +259,6 @@ class MySqlDriver extends NestedSetDriver
      * Удаляет неиспользуемые элементы дерева.
      *
      * @param array $usedPrimaries
-     *
-     * @return void
      */
     public function deleteUnusedItems(array $usedPrimaries): void
     {

@@ -8,10 +8,10 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Trait Scopes
+ * Trait Scopes.
  *
- * @package Adapterap\NestedSet\Traits
  * @mixin NestedSetModelTrait
+ *
  * @method self whereDoesNotHaveParent()
  * @method self whereIsRoot()
  * @method self orderByLft(string $direction = 'asc')
@@ -50,7 +50,7 @@ trait Scopes
      * Сортировка дерева по индексу вложенности.
      *
      * @param Builder $builder
-     * @param string $direction
+     * @param string  $direction
      *
      * @return Builder
      */
@@ -63,7 +63,7 @@ trait Scopes
      * Фильтр по дочерним элементам указанной модели.
      *
      * @param Builder $builder
-     * @param Model $model
+     * @param Model   $model
      *
      * @return Builder
      */
@@ -76,7 +76,7 @@ trait Scopes
      * Фильтр по дочерним элементам указанной модели.
      *
      * @param Builder $builder
-     * @param mixed $id
+     * @param mixed   $id
      *
      * @return Builder
      */
@@ -89,7 +89,7 @@ trait Scopes
      * Фильтр по потомкам указанного предка.
      *
      * @param Builder $builder
-     * @param Model $model
+     * @param Model   $model
      *
      * @return Builder
      */
@@ -102,7 +102,7 @@ trait Scopes
      * Фильтр по потомкам указанного предка.
      *
      * @param Builder $builder
-     * @param mixed $primary
+     * @param mixed   $primary
      *
      * @return Builder
      */

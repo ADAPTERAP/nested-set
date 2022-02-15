@@ -12,8 +12,8 @@ class NestedSetQuery
     /**
      * Подготавливает запрос к выполнению.
      *
-     * @param string $query
-     * @param Model|NestedSetModelTrait|SoftDeletes  $model
+     * @param string                                $query
+     * @param Model|NestedSetModelTrait|SoftDeletes $model
      *
      * @return array|string|string[]
      */
@@ -40,9 +40,9 @@ class NestedSetQuery
     }
 
     /**
-     * Добавляет условия для полей в scope у модели, если есть
+     * Добавляет условия для полей в scope у модели, если есть.
      *
-     * @param NestedSetModelTrait|Model $model
+     * @param Model|NestedSetModelTrait $model
      * @param bool                      $addWhere Добавлять ли WHERE
      *
      * @return string

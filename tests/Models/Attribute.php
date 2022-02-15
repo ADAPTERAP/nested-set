@@ -5,28 +5,30 @@ namespace Adapterap\NestedSet\Tests\Models;
 use Adapterap\NestedSet\NestedSetModelTrait;
 use Adapterap\NestedSet\Tests\Factories\AttributeFactory;
 use Carbon\Carbon;
+use Illuminate\Database\Capsule\Manager;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Schema\Blueprint;
 
 /**
- * Class Attribute
+ * Class Attribute.
  *
- * @package Adapterap\NestedSet\Tests\Models
- * @property int $id
- * @property string $name
- * @property int $place
- * @property int|null $parent_id
- * @property int $lft
- * @property int $rgt
- * @property int $depth
- * @property Carbon $created_at
- * @property Carbon $updated_at
- * @property Carbon|null $deleted_at
+ * @property int         $id
+ * @property string      $name
+ * @property int         $place
+ * @property null|int    $parent_id
+ * @property int         $lft
+ * @property int         $rgt
+ * @property int         $depth
+ * @property Carbon      $created_at
+ * @property Carbon      $updated_at
+ * @property null|Carbon $deleted_at
  */
 class Attribute extends Model
 {
-    use SoftDeletes, HasFactory, NestedSetModelTrait;
+    use SoftDeletes;
+    use HasFactory;
+    use NestedSetModelTrait;
 
     public const PLACE_ONE = 1;
     public const PLACE_TWO = 2;
@@ -34,7 +36,7 @@ class Attribute extends Model
     /**
      * The connection name for the model.
      *
-     * @var string|null
+     * @var null|string
      */
     protected $connection = 'default';
 
@@ -64,6 +66,33 @@ class Attribute extends Model
         'rgt' => 'integer',
         'depth' => 'integer',
     ];
+
+    /**
+     * Создает таблицу.
+     */
+    public static function createTable(): void
+    {
+        $schema = Manager::schema('default');
+
+        $schema->dropIfExists('attributes');
+        $schema->create('attributes', static function (Blueprint $table) {
+            $table->id();
+            $table->string('name')->unique();
+            $table->unsignedBigInteger('place');
+            $table->unsignedBigInteger('parent_id')
+                ->nullable();
+            $table->unsignedBigInteger('lft');
+            $table->unsignedBigInteger('rgt');
+            $table->unsignedBigInteger('depth');
+            $table->timestamps();
+            $table->softDeletes();
+
+            $table->foreign('parent_id')
+                ->references('id')
+                ->on('attributes')
+                ->cascadeOnDelete();
+        });
+    }
 
     /**
      * Возвращает названия полей по которым необходимо сгруппировать деревья.

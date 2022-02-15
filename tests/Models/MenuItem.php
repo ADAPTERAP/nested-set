@@ -2,34 +2,29 @@
 
 namespace Adapterap\NestedSet\Tests\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Adapterap\NestedSet\NestedSetModelTrait;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Adapterap\NestedSet\Tests\Factories\MenuItemFactory;
+use Illuminate\Database\Capsule\Manager;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Adapterap\NestedSet\Tests\Factories\MenuItemFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Schema\Blueprint;
 
 /**
- * Class MenuItem
- *
- * @package Adapterap\NestedSet\Tests\Models
+ * Class MenuItem.
  *
  * @property-read int $id
- * @property int      $menu_id
- * @property int      $parent_id
- * @property string   $name
+ * @property int    $menu_id
+ * @property int    $parent_id
+ * @property string $name
  *
  * @method static MenuItemFactory factory(...$parameters)
  */
 class MenuItem extends Model
 {
-    use NestedSetModelTrait, HasFactory, SoftDeletes;
-
-    protected $fillable = [
-        'name',
-        'menu_id',
-        'parent_id',
-    ];
+    use NestedSetModelTrait;
+    use HasFactory;
+    use SoftDeletes;
 
     /**
      * Indicates if the model should be timestamped.
@@ -38,21 +33,66 @@ class MenuItem extends Model
      */
     public $timestamps = false;
 
+    protected $fillable = [
+        'name',
+        'menu_id',
+        'parent_id',
+    ];
+
     /**
      * The connection name for the model.
      *
-     * @var string|null
+     * @var null|string
      */
     protected $connection = 'default';
 
     /**
-     * Возвращает массив полей объединяющих узлы
+     * Возвращает массив полей объединяющих узлы.
      *
      * @return array
      */
     public function getScopeAttributes(): array
     {
         return ['menu_id'];
+    }
+
+    /**
+     * Создает таблицу.
+     */
+    public static function createTable(): void
+    {
+        $schema = Manager::schema('default');
+
+        if ($schema->hasTable('menu_items')) {
+            $schema->disableForeignKeyConstraints();
+            Manager::table('menu_items')->truncate();
+
+            $schema->drop('menu_items');
+            $schema->enableForeignKeyConstraints();
+        }
+
+        $schema->create('menu_items', static function (Blueprint $table) {
+            $table->id();
+            $table->string('name')->unique();
+            $table->unsignedBigInteger('menu_id');
+            $table->unsignedBigInteger('parent_id')
+                ->nullable();
+            $table->unsignedBigInteger('lft');
+            $table->unsignedBigInteger('rgt');
+            $table->unsignedBigInteger('depth');
+            $table->timestamps();
+            $table->softDeletes();
+
+            $table->foreign('parent_id')
+                ->references('id')
+                ->on('menu_items')
+                ->cascadeOnDelete();
+
+            $table->foreign('menu_id')
+                ->references('id')
+                ->on('menus')
+                ->cascadeOnDelete();
+        });
     }
 
     /**

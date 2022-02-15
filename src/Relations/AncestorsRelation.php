@@ -9,15 +9,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Expression;
 
 /**
- * Class AncestorsRelation
+ * Class AncestorsRelation.
  *
- * @package Adapterap\NestedSet\Relations
  * @property-read Model|NestedSetModelTrait $parent
  */
 class AncestorsRelation extends BaseRelation
 {
     /**
-     * Направление сортировки по умолчанию
+     * Направление сортировки по умолчанию.
      *
      * @var string
      */

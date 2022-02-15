@@ -2,12 +2,16 @@
 
 namespace Adapterap\NestedSet\Tests\Feature;
 
+use Adapterap\NestedSet\Exceptions\NestedSetCreateChildHasOtherScope;
 use Adapterap\NestedSet\Tests\Models\Category;
+use Adapterap\NestedSet\Tests\Models\MenuItem;
 use Adapterap\NestedSet\Tests\TestCase;
 use Illuminate\Database\Capsule\Manager;
-use Adapterap\NestedSet\Tests\Models\MenuItem;
-use Adapterap\NestedSet\Exceptions\NestedSetCreateChildHasOtherScope;
 
+/**
+ * @internal
+ * @coversNothing
+ */
 class CreateTest extends TestCase
 {
     /**
@@ -17,7 +21,7 @@ class CreateTest extends TestCase
     {
         $root = Category::factory()->create();
 
-        self::assertDatabaseHas('categories', [
+        $this->assertDatabaseHas('categories', [
             'id' => $root->id,
             'lft' => 0,
             'rgt' => 1,
@@ -36,7 +40,7 @@ class CreateTest extends TestCase
             'parent_id' => $root->id,
         ]);
 
-        self::assertDatabaseHas('categories', [
+        $this->assertDatabaseHas('categories', [
             'id' => $root->id,
             'lft' => 0,
             'rgt' => 3,
@@ -44,7 +48,7 @@ class CreateTest extends TestCase
             'parent_id' => null,
         ]);
 
-        self::assertDatabaseHas('categories', [
+        $this->assertDatabaseHas('categories', [
             'id' => $child->id,
             'lft' => 1,
             'rgt' => 2,
@@ -64,7 +68,7 @@ class CreateTest extends TestCase
             'menu_id' => $root->menu_id,
         ]);
 
-        self::assertDatabaseHas('menu_items', [
+        $this->assertDatabaseHas('menu_items', [
             'id' => $root->id,
             'lft' => 0,
             'rgt' => 3,
@@ -73,7 +77,7 @@ class CreateTest extends TestCase
             'menu_id' => $root->menu_id,
         ]);
 
-        self::assertDatabaseHas('menu_items', [
+        $this->assertDatabaseHas('menu_items', [
             'id' => $child->id,
             'lft' => 1,
             'rgt' => 2,
@@ -84,13 +88,13 @@ class CreateTest extends TestCase
     }
 
     /**
-     * Создание дочеренего элемента в дереве, с разным scope
+     * Создание дочеренего элемента в дереве, с разным scope.
      */
     public function testCreateSingleChildWithDifferentScope(): void
     {
         $root = MenuItem::factory()->create();
 
-        self::assertDatabaseHas('menu_items', [
+        $this->assertDatabaseHas('menu_items', [
             'id' => $root->id,
             'lft' => 0,
             'rgt' => 1,
@@ -105,7 +109,7 @@ class CreateTest extends TestCase
             'parent_id' => $root->id,
         ]);
 
-        self::assertDatabaseDoesNotHave('menu_items', [
+        $this->assertDatabaseMissing('menu_items', [
             'id' => $child->id,
             'lft' => 1,
             'rgt' => 2,
@@ -130,7 +134,7 @@ class CreateTest extends TestCase
             'parent_id' => $child1->id,
         ]);
 
-        self::assertDatabaseHas('categories', [
+        $this->assertDatabaseHas('categories', [
             'id' => $root1->id,
             'lft' => 0,
             'rgt' => 5,
@@ -138,7 +142,7 @@ class CreateTest extends TestCase
             'parent_id' => null,
         ]);
 
-        self::assertDatabaseHas('categories', [
+        $this->assertDatabaseHas('categories', [
             'id' => $child1->id,
             'lft' => 1,
             'rgt' => 4,
@@ -146,7 +150,7 @@ class CreateTest extends TestCase
             'parent_id' => $root1->id,
         ]);
 
-        self::assertDatabaseHas('categories', [
+        $this->assertDatabaseHas('categories', [
             'id' => $result->id,
             'lft' => 2,
             'rgt' => 3,
@@ -154,7 +158,7 @@ class CreateTest extends TestCase
             'parent_id' => $child1->id,
         ]);
 
-        self::assertDatabaseHas('categories', [
+        $this->assertDatabaseHas('categories', [
             'id' => $root2->id,
             'lft' => 6,
             'rgt' => 9,
@@ -162,7 +166,7 @@ class CreateTest extends TestCase
             'parent_id' => null,
         ]);
 
-        self::assertDatabaseHas('categories', [
+        $this->assertDatabaseHas('categories', [
             'id' => $child2->id,
             'lft' => 7,
             'rgt' => 8,

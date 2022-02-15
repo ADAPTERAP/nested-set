@@ -9,9 +9,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Expression;
 
 /**
- * Class DescendantsRelation
+ * Class DescendantsRelation.
  *
- * @package Adapterap\NestedSet\Relations
  * @property-read Model|NestedSetModelTrait $parent
  */
 class DescendantsRelation extends BaseRelation

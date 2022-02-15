@@ -18,13 +18,14 @@ class NestedSetInternalBuilder extends Builder
      */
     public function update(array $values): int
     {
-        /** @var NestedSetModelTrait|Model|SoftDeletes $model */
+        /** @var Model|NestedSetModelTrait|SoftDeletes $model */
         $model = $this->getModel();
 
         if (in_array(SoftDeletes::class, class_uses($model), true)) {
             $deletedAtName = $model->getDeletedAtColumn();
+
             if (!empty($values[$deletedAtName])) {
-                return (int)$this->delete();
+                return (int) $this->delete();
             }
         }
 

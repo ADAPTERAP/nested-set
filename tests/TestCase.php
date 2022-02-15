@@ -2,20 +2,23 @@
 
 namespace Adapterap\NestedSet\Tests;
 
-use Adapterap\NestedSet\Tests\Models\Menu;
-use Adapterap\NestedSet\Tests\Models\MenuItem;
 use Adapterap\NestedSet\Handlers\NestedSetSyncTree;
 use Adapterap\NestedSet\Tests\Models\Attribute;
 use Adapterap\NestedSet\Tests\Models\Category;
-use Illuminate\Container\Container;
+use Adapterap\NestedSet\Tests\Models\Menu;
+use Adapterap\NestedSet\Tests\Models\MenuItem;
+use Carbon\Carbon;
+use Dotenv\Dotenv;
 use Illuminate\Database\Capsule\Manager;
-use Illuminate\Database\ConnectionResolver;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Events\Dispatcher;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Application;
 use JsonException;
-use Symfony\Component\VarDumper\VarDumper;
 
-class TestCase extends \PHPUnit\Framework\TestCase
+/**
+ * @internal
+ * @coversNothing
+ */
+class TestCase extends \Orchestra\Testbench\TestCase
 {
     /**
      * Позволяет не настраивать несколько раз Manager.
@@ -23,6 +26,13 @@ class TestCase extends \PHPUnit\Framework\TestCase
      * @var bool
      */
     protected static bool $isConfiguredManager = false;
+
+    /**
+     * The Illuminate application instance.
+     *
+     * @var Application
+     */
+    protected $app;
 
     /**
      * This method is called before the first test of this test class is run.
@@ -37,145 +47,29 @@ class TestCase extends \PHPUnit\Framework\TestCase
 
         self::$isConfiguredManager = true;
 
+        $dotenv = Dotenv::createImmutable(dirname(__DIR__));
+        $dotenv->load();
+
         $manager = new Manager();
         $manager->addConnection([
             'driver' => 'mysql',
-            'host' => 'mysqldb',
-            'port' => 3317,
-            'database' => 'nested',
-            'username' => 'root',
-            'password' => 'password',
+            'host' => env('DB_HOST', 'mysqldb'),
+            'port' => env('DB_PORT', 3306),
+            'database' => env('DB_DATABASE', 'nested'),
+            'username' => env('DB_USERNAME', 'root'),
+            'password' => env('DB_PASSWORD', 'password'),
             'charset' => 'utf8',
             'collation' => 'utf8_unicode_ci',
-            'prefix' => '',
         ]);
-
-        $manager->setEventDispatcher(new Dispatcher(new Container));
 
         // Позволяет использовать статичные вызовы при работе с Capsule.
         $manager->setAsGlobal();
         $manager->bootEloquent();
 
-        Category::setConnectionResolver(
-            new ConnectionResolver(['default' => $manager->getConnection('default')])
-        );
-        Attribute::setConnectionResolver(
-            new ConnectionResolver(['default' => $manager->getConnection('default')])
-        );
-
-        $schema = Manager::schema('default');
-
-        $schema->dropIfExists('categories');
-        $schema->create('categories', static function (Blueprint $table) {
-            $table->id();
-            $table->string('name')->unique();
-            $table->unsignedBigInteger('parent_id')
-                ->nullable();
-            $table->unsignedBigInteger('lft');
-            $table->unsignedBigInteger('rgt');
-            $table->unsignedBigInteger('depth');
-            $table->softDeletes();
-
-            $table->foreign('parent_id')
-                ->references('id')
-                ->on('categories')
-                ->cascadeOnDelete();
-        });
-
-        $schema->dropIfExists('attributes');
-        $schema->create('attributes', static function (Blueprint $table) {
-            $table->id();
-            $table->string('name')->unique();
-            $table->unsignedBigInteger('place');
-            $table->unsignedBigInteger('parent_id')
-                ->nullable();
-            $table->unsignedBigInteger('lft');
-            $table->unsignedBigInteger('rgt');
-            $table->unsignedBigInteger('depth');
-            $table->timestamps();
-            $table->softDeletes();
-
-            $table->foreign('parent_id')
-                ->references('id')
-                ->on('attributes')
-                ->cascadeOnDelete();
-        });
-
-        $schema->disableForeignKeyConstraints();
-
-        if ($schema->hasTable('menus')) {
-            $schema->disableForeignKeyConstraints();
-            Manager::table('menus')->truncate();
-
-            $schema->drop('menus');
-            $schema->enableForeignKeyConstraints();
-        }
-
-        $schema->create('menus', static function (Blueprint $table) {
-            $table->id();
-            $table->string('name')->unique();
-        });
-
-        if ($schema->hasTable('menu_items')) {
-            $schema->disableForeignKeyConstraints();
-            Manager::table('menu_items')->truncate();
-
-            $schema->drop('menu_items');
-            $schema->enableForeignKeyConstraints();
-        }
-
-        $schema->create('menu_items', static function (Blueprint $table) {
-            $table->id();
-            $table->string('name')->unique();
-            $table->unsignedBigInteger('menu_id');
-            $table->unsignedBigInteger('parent_id')
-                  ->nullable();
-            $table->unsignedBigInteger('lft');
-            $table->unsignedBigInteger('rgt');
-            $table->unsignedBigInteger('depth');
-            $table->timestamps();
-            $table->softDeletes();
-
-            $table->foreign('parent_id')
-                  ->references('id')
-                  ->on('menu_items')
-                  ->cascadeOnDelete();
-
-            $table->foreign('menu_id')
-                  ->references('id')
-                  ->on('menus')
-                  ->cascadeOnDelete();
-        });
-    }
-
-    /**
-     * Проверяет наличие данных в БД.
-     *
-     * @param string $table
-     * @param array $filters
-     */
-    public static function assertDatabaseHas(string $table, array $filters): void
-    {
-        self::assertTrue(
-            Manager::table($table)
-                ->where($filters)
-                ->exists()
-        );
-    }
-
-    /**
-     * Проверяет отсутствие данных в БД.
-     *
-     * @param string $table
-     * @param array $filters
-     */
-    public static function assertDatabaseDoesNotHave(string $table, array $filters): void
-    {
-        self::assertFalse(
-            Manager::table($table)
-                ->where($filters)
-                ->exists()
-        );
+        Category::createTable();
+        Attribute::createTable();
+        Menu::createTable();
+        MenuItem::createTable();
     }
 
     /**
@@ -183,16 +77,27 @@ class TestCase extends \PHPUnit\Framework\TestCase
      */
     public function setUp(): void
     {
+        $this->app = $this->createApplication();
+        $this->app->bind('db', fn () => Manager::connection('default'));
+
         parent::setUp();
+
+        Category::setUpConnection();
+        Attribute::setUpConnection();
+        Menu::setUpConnection();
+        MenuItem::setUpConnection();
 
         $schema = Manager::schema('default');
         $schema->disableForeignKeyConstraints();
 
-        Manager::table('categories')->truncate();
-        Manager::table('menu_items')->delete();
-        Manager::table('menus')->truncate();
+        Manager::table(Category::table())->truncate();
+        Manager::table(Attribute::table())->truncate();
+        Manager::table(Menu::table())->truncate();
+        Manager::table(MenuItem::table())->truncate();
 
         $schema->enableForeignKeyConstraints();
+
+        Carbon::setTestNow(Carbon::now());
     }
 
     /**
@@ -231,7 +136,6 @@ class TestCase extends \PHPUnit\Framework\TestCase
     /**
      * Создает дерево атрибутов для тестирования.
      *
-     * @return void
      * @throws JsonException
      */
     protected function createAttributeTree(): void
@@ -243,7 +147,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * Создает дерево пунктов меню для тестирования
+     * Создает дерево пунктов меню для тестирования.
      *
      * @return array
      */
@@ -307,15 +211,44 @@ class TestCase extends \PHPUnit\Framework\TestCase
             'menu2Child1212',
         );
     }
-}
 
-if (!function_exists('dd')) {
-    function dd(...$vars)
+    /**
+     * Assert that a given where condition exists in the database.
+     *
+     * @param Model|string $table
+     * @param array        $data
+     * @param null|string  $connection
+     *
+     * @return $this
+     */
+    protected function assertDatabaseHas($table, array $data, $connection = null)
     {
-        foreach ($vars as $v) {
-            VarDumper::dump($v);
-        }
+        self::assertTrue(
+            Manager::table($table)
+                ->where($data)
+                ->exists()
+        );
 
-        exit(1);
+        return $this;
+    }
+
+    /**
+     * Assert that a given where condition does not exist in the database.
+     *
+     * @param Model|string $table
+     * @param array        $data
+     * @param null|string  $connection
+     *
+     * @return $this
+     */
+    protected function assertDatabaseMissing($table, array $data, $connection = null)
+    {
+        self::assertFalse(
+            Manager::table($table)
+                ->where($data)
+                ->exists()
+        );
+
+        return $this;
     }
 }
