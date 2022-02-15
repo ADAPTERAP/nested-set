@@ -12,9 +12,9 @@ use Adapterap\NestedSet\Traits\ReplaceEloquent;
 use Adapterap\NestedSet\Traits\Scopes;
 use Adapterap\NestedSet\Traits\Subscriber;
 use Adapterap\NestedSet\Traits\Tree;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Builder;
 
 /**
  * Trait NestedSet
@@ -75,6 +75,12 @@ trait NestedSetModelTrait
      */
     public function newScopedQuery(): Builder
     {
-        return $this->newQuery()->prepareBuilder();
+        $result = $this->newQuery();
+
+        if (method_exists($result, 'prepareBuilder')) {
+            $result->prepareBuilder();
+        }
+
+        return $result;
     }
 }
