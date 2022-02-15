@@ -5,9 +5,10 @@ namespace Adapterap\NestedSet\Tests\Models;
 use Adapterap\NestedSet\NestedSetModelTrait;
 use Adapterap\NestedSet\Tests\Factories\AttributeFactory;
 use Carbon\Carbon;
+use Illuminate\Database\Capsule\Manager;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Schema\Blueprint;
 
 /**
  * Class Attribute
@@ -64,6 +65,33 @@ class Attribute extends Model
         'rgt' => 'integer',
         'depth' => 'integer',
     ];
+
+    /**
+     * Создает таблицу.
+     */
+    public static function createTable(): void
+    {
+        $schema = Manager::schema('default');
+
+        $schema->dropIfExists('attributes');
+        $schema->create('attributes', static function (Blueprint $table) {
+            $table->id();
+            $table->string('name')->unique();
+            $table->unsignedBigInteger('place');
+            $table->unsignedBigInteger('parent_id')
+                ->nullable();
+            $table->unsignedBigInteger('lft');
+            $table->unsignedBigInteger('rgt');
+            $table->unsignedBigInteger('depth');
+            $table->timestamps();
+            $table->softDeletes();
+
+            $table->foreign('parent_id')
+                ->references('id')
+                ->on('attributes')
+                ->cascadeOnDelete();
+        });
+    }
 
     /**
      * Возвращает названия полей по которым необходимо сгруппировать деревья.

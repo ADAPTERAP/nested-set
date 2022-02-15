@@ -2,12 +2,13 @@
 
 namespace Adapterap\NestedSet\Tests\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Capsule\Manager;
 use Adapterap\NestedSet\NestedSetModelTrait;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Adapterap\NestedSet\Tests\Factories\MenuItemFactory;
+use Illuminate\Database\Schema\Blueprint;
 
 /**
  * Class MenuItem
@@ -54,6 +55,46 @@ class MenuItem extends Model
     {
         return ['menu_id'];
     }
+
+    /**
+     * Создает таблицу.
+     */
+    public static function createTable(): void
+    {
+        $schema = Manager::schema('default');
+
+        if ($schema->hasTable('menu_items')) {
+            $schema->disableForeignKeyConstraints();
+            Manager::table('menu_items')->truncate();
+
+            $schema->drop('menu_items');
+            $schema->enableForeignKeyConstraints();
+        }
+
+        $schema->create('menu_items', static function (Blueprint $table) {
+            $table->id();
+            $table->string('name')->unique();
+            $table->unsignedBigInteger('menu_id');
+            $table->unsignedBigInteger('parent_id')
+                ->nullable();
+            $table->unsignedBigInteger('lft');
+            $table->unsignedBigInteger('rgt');
+            $table->unsignedBigInteger('depth');
+            $table->timestamps();
+            $table->softDeletes();
+
+            $table->foreign('parent_id')
+                ->references('id')
+                ->on('menu_items')
+                ->cascadeOnDelete();
+
+            $table->foreign('menu_id')
+                ->references('id')
+                ->on('menus')
+                ->cascadeOnDelete();
+        });
+    }
+
 
     /**
      * Create a new factory instance for the model.

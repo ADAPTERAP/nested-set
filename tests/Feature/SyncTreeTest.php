@@ -28,10 +28,10 @@ class SyncTreeTest extends TestCase
         Category::syncTree($tree, ['name'], ['name']);
         $this->asserts($tree);
 
-        self::assertDatabaseHas('categories', [
+        $this->assertDatabaseHas('categories', [
             'id' => $categoryWillBeDelete->id,
         ]);
-        self::assertDatabaseDoesNotHave('categories', [
+        $this->assertDatabaseMissing('categories', [
             'id' => $categoryWillBeDelete->id,
             'deleted_at' => null,
         ]);
@@ -49,7 +49,7 @@ class SyncTreeTest extends TestCase
         foreach ($tree as $item) {
             $rgt = $lft + $this->getCountDescendants($item) * 2 + 1;
 
-            self::assertDatabaseHas('categories', [
+            $this->assertDatabaseHas('categories', [
                 'name' => $item['name'],
                 'lft' => $lft,
                 'rgt' => $rgt,

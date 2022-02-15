@@ -29,10 +29,10 @@ class SyncTreeScopeTest extends TestCase
         MenuItem::syncTree($tree, ['name'], ['name']);
         $this->asserts($tree);
 
-        self::assertDatabaseHas('menu_items', [
+        $this->assertDatabaseHas('menu_items', [
             'id' => $menuItemWillBeDelete->id,
         ]);
-        self::assertDatabaseDoesNotHave('menu_items', [
+        $this->assertDatabaseMissing('menu_items', [
             'id' => $menuItemWillBeDelete->id,
             'deleted_at' => null,
         ]);
@@ -50,7 +50,7 @@ class SyncTreeScopeTest extends TestCase
         foreach ($tree as $item) {
             $rgt = $lft + $this->getCountDescendants($item) * 2 + 1;
 
-            self::assertDatabaseHas('menu_items', [
+            $this->assertDatabaseHas('menu_items', [
                 'name' => $item['name'],
                 'lft' => $lft,
                 'rgt' => $rgt,
