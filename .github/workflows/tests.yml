@@ -18,10 +18,16 @@ jobs:
           php-version: 8.0
 
       - name: Install Dependencies via Composer
-        run: composer install --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+        run: composer install --no-ansi --no-interaction --no-scripts --no-suggest --no-progress --prefer-dist
 
       - name: Copy ENV for CI
         run: php -r "file_exists('.env') || copy('.env.ci', '.env');"
+
+      - name: Wait for MySQL
+        run: |
+          while ! mysqladmin ping --host=127.0.0.1 --password=dbpassword --silent; do
+            sleep 1
+          done
 
       - name: Execute tests via PHPUnit
         run: vendor/bin/phpunit
