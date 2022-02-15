@@ -2,16 +2,14 @@
 
 namespace Adapterap\NestedSet\Tests\Models;
 
+use Adapterap\NestedSet\Tests\Factories\MenuFactory;
 use Illuminate\Database\Capsule\Manager;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Adapterap\NestedSet\Tests\Factories\MenuFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Schema\Blueprint;
 
 /**
- * Class Menu
- *
- * @package Adapterap\NestedSet\Tests\Models
+ * Class Menu.
  *
  * @property-read int $id
  * @property string $name
@@ -22,10 +20,6 @@ class Menu extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'name',
-    ];
-
     /**
      * Indicates if the model should be timestamped.
      *
@@ -33,10 +27,14 @@ class Menu extends Model
      */
     public $timestamps = false;
 
+    protected $fillable = [
+        'name',
+    ];
+
     /**
      * The connection name for the model.
      *
-     * @var string|null
+     * @var null|string
      */
     protected $connection = 'default';
 

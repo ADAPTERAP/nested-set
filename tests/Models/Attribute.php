@@ -11,23 +11,24 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Schema\Blueprint;
 
 /**
- * Class Attribute
+ * Class Attribute.
  *
- * @package Adapterap\NestedSet\Tests\Models
- * @property int $id
- * @property string $name
- * @property int $place
- * @property int|null $parent_id
- * @property int $lft
- * @property int $rgt
- * @property int $depth
- * @property Carbon $created_at
- * @property Carbon $updated_at
- * @property Carbon|null $deleted_at
+ * @property int         $id
+ * @property string      $name
+ * @property int         $place
+ * @property null|int    $parent_id
+ * @property int         $lft
+ * @property int         $rgt
+ * @property int         $depth
+ * @property Carbon      $created_at
+ * @property Carbon      $updated_at
+ * @property null|Carbon $deleted_at
  */
 class Attribute extends Model
 {
-    use SoftDeletes, HasFactory, NestedSetModelTrait;
+    use SoftDeletes;
+    use HasFactory;
+    use NestedSetModelTrait;
 
     public const PLACE_ONE = 1;
     public const PLACE_TWO = 2;
@@ -35,7 +36,7 @@ class Attribute extends Model
     /**
      * The connection name for the model.
      *
-     * @var string|null
+     * @var null|string
      */
     protected $connection = 'default';
 

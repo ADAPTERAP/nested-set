@@ -8,31 +8,30 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Class MenuFactory
+ * Class MenuFactory.
  *
- * @package Adapterap\NestedSet\Tests\Factories
- * @method Menu|Menu[]|Collection create($attributes = [], ?Model $parent = null)
+ * @method Collection|Menu|Menu[] create($attributes = [], ?Model $parent = null)
  * @method Menu                   createOne($attributes = [])
- * @method Menu[]|Collection      createMany(iterable $records)
- * @method Menu[]|Collection      createChildren(Model $model)
- * @method Menu|Menu[]|Collection make($attributes = [], ?Model $parent = null)
+ * @method Collection|Menu[]      createMany(iterable $records)
+ * @method Collection|Menu[]      createChildren(Model $model)
+ * @method Collection|Menu|Menu[] make($attributes = [], ?Model $parent = null)
  * @method Menu                   makeOne($attributes = [])
  * @method MenuFactory            state($state)
  */
 class MenuFactory extends Factory
 {
-    public function __construct($count = null, ?\Illuminate\Support\Collection $states = null, ?\Illuminate\Support\Collection $has = null, ?\Illuminate\Support\Collection $for = null, ?\Illuminate\Support\Collection $afterMaking = null, ?\Illuminate\Support\Collection $afterCreating = null, $connection = null)
-    {
-        parent::__construct($count, $states, $has, $for, $afterMaking, $afterCreating, $connection);
-        $this->faker = \Faker\Factory::create();
-    }
-
     /**
      * The name of the factory's corresponding model.
      *
      * @var string
      */
     protected $model = Menu::class;
+
+    public function __construct($count = null, ?\Illuminate\Support\Collection $states = null, ?\Illuminate\Support\Collection $has = null, ?\Illuminate\Support\Collection $for = null, ?\Illuminate\Support\Collection $afterMaking = null, ?\Illuminate\Support\Collection $afterCreating = null, $connection = null)
+    {
+        parent::__construct($count, $states, $has, $for, $afterMaking, $afterCreating, $connection);
+        $this->faker = \Faker\Factory::create();
+    }
 
     /**
      * Define the model's default state.

@@ -12,26 +12,23 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Schema\Blueprint;
 
 /**
- * Class Category
+ * Class Category.
  *
- * @package Adapterap\NestedSet\Tests\Models
  * @method static CategoryFactory factory()
+ *
  * @property-read int $id
- * @property string $name
- * @property int $lft
- * @property int $rgt
- * @property int $parent_id
- * @property int $depth
- * @property Carbon|null $deleted_at
+ * @property string      $name
+ * @property int         $lft
+ * @property int         $rgt
+ * @property int         $parent_id
+ * @property int         $depth
+ * @property null|Carbon $deleted_at
  */
 class Category extends Model
 {
-    use NestedSetModelTrait, HasFactory, SoftDeletes;
-
-    protected $fillable = [
-        'name',
-        'parent_id',
-    ];
+    use NestedSetModelTrait;
+    use HasFactory;
+    use SoftDeletes;
 
     /**
      * Indicates if the model should be timestamped.
@@ -40,10 +37,15 @@ class Category extends Model
      */
     public $timestamps = false;
 
+    protected $fillable = [
+        'name',
+        'parent_id',
+    ];
+
     /**
      * The connection name for the model.
      *
-     * @var string|null
+     * @var null|string
      */
     protected $connection = 'default';
 

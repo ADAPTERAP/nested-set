@@ -2,12 +2,16 @@
 
 namespace Adapterap\NestedSet\Tests\Feature;
 
-use Adapterap\NestedSet\Tests\Models\Menu;
-use Adapterap\NestedSet\Tests\Models\MenuItem;
 use Adapterap\NestedSet\Relations\AncestorsRelation;
 use Adapterap\NestedSet\Tests\Models\Category;
+use Adapterap\NestedSet\Tests\Models\Menu;
+use Adapterap\NestedSet\Tests\Models\MenuItem;
 use Adapterap\NestedSet\Tests\TestCase;
 
+/**
+ * @internal
+ * @coversNothing
+ */
 class AncestorsTest extends TestCase
 {
     /**
@@ -53,8 +57,8 @@ class AncestorsTest extends TestCase
         ] = $this->createMenuItemsTree();
 
         $ancestors = $child1112->ancestors()
-                               ->orderByDesc('lft')
-                               ->get();
+            ->orderByDesc('lft')
+            ->get();
 
         self::assertCount(3, $ancestors);
         self::assertEquals($child111->id, $ancestors->get(0)->id);
@@ -90,7 +94,7 @@ class AncestorsTest extends TestCase
         $children->load([
             'ancestors' => function (AncestorsRelation $builder) {
                 $builder->orderByDesc('lft');
-            }
+            },
         ]);
 
         // child1112
@@ -139,7 +143,7 @@ class AncestorsTest extends TestCase
         $children->load([
             'ancestors' => function (AncestorsRelation $builder) use ($menu1) {
                 $builder->where('menu_id', $menu1->id)->orderByDesc('lft');
-            }
+            },
         ]);
 
         // child1112
@@ -262,7 +266,6 @@ class AncestorsTest extends TestCase
             ])
             ->orderBy('lft')
             ->get();
-
 
         self::assertCount(5, $children);
 

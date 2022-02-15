@@ -39,20 +39,18 @@ abstract class NestedSetDriver
     /**
      * Пересчитывает индексы вложенности для:
      * - всех предков $lft
-     * - всех элементов ниже $lft
+     * - всех элементов ниже $lft.
      *
      * @param mixed $primary Идентификатор созданного элемента
-     * @param int $lft Индекс вложенности слева созданного элемента
-     *
-     * @return void
+     * @param int   $lft     Индекс вложенности слева созданного элемента
      */
     abstract public function freshIndexesAfterInsert($primary, int $lft): void;
 
     /**
      * Перемещение поддерева.
      *
-     * @param int $id
-     * @param int $parentId
+     * @param int   $id
+     * @param int   $parentId
      * @param array $values
      *
      * @return int
@@ -82,17 +80,15 @@ abstract class NestedSetDriver
      *
      * @param int $lft
      * @param int $rgt
-     *
-     * @return void
      */
     abstract public function freshIndexesAfterForceDelete(int $lft, int $rgt): void;
 
     /**
      * Insert new records or update the existing ones.
      *
-     * @param array $preparedValues
-     * @param array $uniqueBy
-     * @param array|null $update
+     * @param array      $preparedValues
+     * @param array      $uniqueBy
+     * @param null|array $update
      *
      * @return SupportCollection
      */
@@ -102,8 +98,6 @@ abstract class NestedSetDriver
      * Удаляет неиспользуемые элементы дерева.
      *
      * @param array $usedPrimaries
-     *
-     * @return void
      */
     abstract public function deleteUnusedItems(array $usedPrimaries): void;
 }

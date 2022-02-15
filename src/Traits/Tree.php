@@ -8,9 +8,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Trait MakeTree
- *
- * @package Adapterap\NestedSet\Traits
+ * Trait MakeTree.
  */
 trait Tree
 {
@@ -18,9 +16,9 @@ trait Tree
      * Синхронизирует дерево.
      *
      * @param $values
-     * @param array $uniqueBy
-     * @param array|null $update
-     * @param Closure|null $map
+     * @param array        $uniqueBy
+     * @param null|array   $update
+     * @param null|Closure $map
      *
      * @return Collection
      */

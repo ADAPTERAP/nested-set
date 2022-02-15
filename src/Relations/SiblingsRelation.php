@@ -8,9 +8,8 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Class SiblingsRelation
+ * Class SiblingsRelation.
  *
- * @package Adapterap\NestedSet\Relations
  * @property-read Model|NestedSetModelTrait $parent
  */
 class SiblingsRelation extends BaseRelation

@@ -2,35 +2,29 @@
 
 namespace Adapterap\NestedSet\Tests\Models;
 
-use Illuminate\Database\Capsule\Manager;
 use Adapterap\NestedSet\NestedSetModelTrait;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Adapterap\NestedSet\Tests\Factories\MenuItemFactory;
+use Illuminate\Database\Capsule\Manager;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Adapterap\NestedSet\Tests\Factories\MenuItemFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Schema\Blueprint;
 
 /**
- * Class MenuItem
- *
- * @package Adapterap\NestedSet\Tests\Models
+ * Class MenuItem.
  *
  * @property-read int $id
- * @property int      $menu_id
- * @property int      $parent_id
- * @property string   $name
+ * @property int    $menu_id
+ * @property int    $parent_id
+ * @property string $name
  *
  * @method static MenuItemFactory factory(...$parameters)
  */
 class MenuItem extends Model
 {
-    use NestedSetModelTrait, HasFactory, SoftDeletes;
-
-    protected $fillable = [
-        'name',
-        'menu_id',
-        'parent_id',
-    ];
+    use NestedSetModelTrait;
+    use HasFactory;
+    use SoftDeletes;
 
     /**
      * Indicates if the model should be timestamped.
@@ -39,15 +33,21 @@ class MenuItem extends Model
      */
     public $timestamps = false;
 
+    protected $fillable = [
+        'name',
+        'menu_id',
+        'parent_id',
+    ];
+
     /**
      * The connection name for the model.
      *
-     * @var string|null
+     * @var null|string
      */
     protected $connection = 'default';
 
     /**
-     * Возвращает массив полей объединяющих узлы
+     * Возвращает массив полей объединяющих узлы.
      *
      * @return array
      */
@@ -94,7 +94,6 @@ class MenuItem extends Model
                 ->cascadeOnDelete();
         });
     }
-
 
     /**
      * Create a new factory instance for the model.

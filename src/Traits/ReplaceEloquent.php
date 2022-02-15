@@ -2,19 +2,19 @@
 
 namespace Adapterap\NestedSet\Traits;
 
-use Illuminate\Database\Eloquent\Builder;
 use Adapterap\NestedSet\Builders\NestedSetBuilder;
 use Adapterap\NestedSet\Builders\NestedSetInternalBuilder;
 use Adapterap\NestedSet\Collections\NestedSetCollection;
 use Adapterap\NestedSet\NestedSetModelTrait;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 
 /**
- * Trait ReplaceEloquent
- * @package Adapterap\NestedSet\Traits
+ * Trait ReplaceEloquent.
+ *
  * @method static NestedSetBuilder query()
  */
 trait ReplaceEloquent
@@ -53,7 +53,7 @@ trait ReplaceEloquent
     /**
      * @param array $attributes
      *
-     * @return NestedSetBuilder|Builder
+     * @return Builder|NestedSetBuilder
      */
     public static function scoped(array $attributes): Builder
     {

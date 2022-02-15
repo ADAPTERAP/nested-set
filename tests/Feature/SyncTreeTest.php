@@ -5,6 +5,10 @@ namespace Adapterap\NestedSet\Tests\Feature;
 use Adapterap\NestedSet\Tests\Models\Category;
 use Adapterap\NestedSet\Tests\TestCase;
 
+/**
+ * @internal
+ * @coversNothing
+ */
 class SyncTreeTest extends TestCase
 {
     /**
@@ -41,8 +45,8 @@ class SyncTreeTest extends TestCase
      * Рекурсивно проверяет корректность сохраненных данных в БД.
      *
      * @param array $tree
-     * @param int $lft
-     * @param int $depth
+     * @param int   $lft
+     * @param int   $depth
      */
     protected function asserts(array $tree, int $lft = 0, int $depth = 0): void
     {
@@ -73,6 +77,7 @@ class SyncTreeTest extends TestCase
     protected function getCountDescendants(array $item): int
     {
         $count = 0;
+
         foreach ($item['children'] ?? [] as $child) {
             $count += $this->getCountDescendants($child) + 1;
         }
@@ -170,7 +175,7 @@ class SyncTreeTest extends TestCase
                         ],
                     ],
                 ],
-            ]
+            ],
         ];
     }
 }

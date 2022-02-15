@@ -13,7 +13,7 @@ use stdClass;
 class NestedSetSyncTree
 {
     /**
-     * Аналог кеша. Запоминает количество потомков для каждого элемента
+     * Аналог кеша. Запоминает количество потомков для каждого элемента.
      *
      * @var array<int, int>
      */
@@ -67,14 +67,14 @@ class NestedSetSyncTree
      * NestedSetSyncTree constructor.
      *
      * @param Model|NestedSetModelTrait $model
-     * @param Closure|null              $map
+     * @param null|Closure              $map
      * @param array                     $uniqueBy
-     * @param array|null                $update
+     * @param null|array                $update
      */
     public function __construct(Model $model, ?Closure $map, array $uniqueBy, ?array $update = null)
     {
         $this->stub = $model;
-        $this->map = $map ?? static fn($item) => (array)$item;
+        $this->map = $map ?? static fn ($item) => (array) $item;
         $this->uniqueBy = $uniqueBy;
         $this->update = array_unique(
             array_merge($update ?? [], [
@@ -99,6 +99,7 @@ class NestedSetSyncTree
         // Группируем элементы по nestedGroupBy
         foreach ($values as $index => $item) {
             $parts = [];
+
             foreach ($this->stub->getNestedGroupBy() as $fieldName) {
                 $parts[] = $item[$fieldName] ?? [];
             }
@@ -112,6 +113,7 @@ class NestedSetSyncTree
 
         // Сохраняем дерево
         $rawParents = [];
+
         foreach ($groupedValues as $group) {
             foreach ($this->getValuesForUpsert($group) as $item) {
                 $rawParents[] = $item;
@@ -196,7 +198,7 @@ class NestedSetSyncTree
      * @param array    $values
      * @param int      $lft
      * @param int      $depth
-     * @param int|null $parentId
+     * @param null|int $parentId
      *
      * @return array
      */
@@ -221,7 +223,7 @@ class NestedSetSyncTree
                 unset($item['children']);
             }
 
-            $lft = (int)$item[$this->stub->getRgtName()] + 1;
+            $lft = (int) $item[$this->stub->getRgtName()] + 1;
             $upsert[$uniqueKey] = $item;
         }
 
@@ -253,16 +255,16 @@ class NestedSetSyncTree
 
     /**
      * Определяет и возвращает уникальный идентификатор элемента
-     * для дальнейшей связки
+     * для дальнейшей связки.
      *
-     * @param array|stdClass|Model $item
+     * @param array|Model|stdClass $item
      *
      * @return string
      */
     protected function getUniqueKeyForItem($item): string
     {
         $parts = [];
-        $attributes = $item instanceof Model ? $item->getAttributes() : (array)$item;
+        $attributes = $item instanceof Model ? $item->getAttributes() : (array) $item;
 
         foreach ($this->stub->getNestedGroupBy() as $fieldName) {
             $parts[] = $item[$fieldName] ?? null;

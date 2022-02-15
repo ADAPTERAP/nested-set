@@ -9,15 +9,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 
 /**
- * Class BaseRelation
+ * Class BaseRelation.
  *
- * @package Adapterap\NestedSet\Relations
  * @property-read Model|NestedSetModelTrait $parent
  */
 abstract class BaseRelation extends Relation
 {
     /**
-     * Направление сортировки по умолчанию
+     * Направление сортировки по умолчанию.
      *
      * @var string
      */
@@ -25,8 +24,6 @@ abstract class BaseRelation extends Relation
 
     /**
      * Set the base constraints on the relation query.
-     *
-     * @return void
      */
     public function addConstraints(): void
     {
@@ -45,8 +42,6 @@ abstract class BaseRelation extends Relation
      * Set the constraints for an eager load of the relation.
      *
      * @param Model[]|NestedSetModelTrait[] $models
-     *
-     * @return void
      */
     public function addEagerConstraints(array $models): void
     {
@@ -67,7 +62,7 @@ abstract class BaseRelation extends Relation
      * Initialize the relation on a set of models.
      *
      * @param Model[] $models
-     * @param string $relation
+     * @param string  $relation
      *
      * @return array
      */
@@ -106,16 +101,6 @@ abstract class BaseRelation extends Relation
     }
 
     /**
-     * Добавляет фильтры к указанному билдеру для указанной модели.
-     *
-     * @param Builder                   $builder
-     * @param Model|NestedSetModelTrait $model
-     *
-     * @return Builder
-     */
-    abstract protected static function addFiltersForModel(Builder $builder, Model $model): Builder;
-
-    /**
      * Get the key for comparing against the parent key in "has" query.
      *
      * @return string
@@ -124,4 +109,14 @@ abstract class BaseRelation extends Relation
     {
         return $this->getModel()->getKeyName();
     }
+
+    /**
+     * Добавляет фильтры к указанному билдеру для указанной модели.
+     *
+     * @param Builder                   $builder
+     * @param Model|NestedSetModelTrait $model
+     *
+     * @return Builder
+     */
+    abstract protected static function addFiltersForModel(Builder $builder, Model $model): Builder;
 }

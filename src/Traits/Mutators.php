@@ -3,9 +3,8 @@
 namespace Adapterap\NestedSet\Traits;
 
 /**
- * Trait Mutators
+ * Trait Mutators.
  *
- * @package Adapterap\NestedSet\Traits
  * @property-read bool $is_root
  * @property-read bool $is_child
  * @property-read bool $has_children
@@ -43,7 +42,7 @@ trait Mutators
     }
 
     /**
-     * Возвращает массив полей объединяющих узлы
+     * Возвращает массив полей объединяющих узлы.
      *
      * @return array
      */

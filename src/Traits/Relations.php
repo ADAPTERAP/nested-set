@@ -11,10 +11,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
 
 /**
- * Trait Relations
+ * Trait Relations.
  *
- * @package Adapterap\NestedSet\Traits
- * @property-read $this|null         $parent
+ * @property-read null|$this         $parent
  * @property-read Collection|$this[] $children
  * @property-read Collection|$this[] $descendants
  * @property-read Collection|$this[] $ancestors
