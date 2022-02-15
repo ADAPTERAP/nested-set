@@ -4,6 +4,12 @@ jobs:
   phpunit:
     runs-on: ubuntu-latest
     steps:
+      - name: Set up MySQL
+        uses: mirromutth/mysql-action@v1.1
+        with:
+          mysql database: 'dbname'
+          mysql root password: 'dbpassword'
+
       - uses: actions/checkout@v2
 
       - name: Setup PHP
@@ -13,6 +19,9 @@ jobs:
 
       - name: Install Dependencies via Composer
         run: composer install --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+
+      - name: Copy ENV for CI
+        run: php -r "file_exists('.env') || copy('.env.ci', '.env');"
 
       - name: Execute tests via PHPUnit
         run: vendor/bin/phpunit
