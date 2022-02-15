@@ -1,0 +1,18 @@
+name: CI Tests Run
+on: [ push ]
+jobs:
+  phpunit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.0
+
+      - name: Install Dependencies via Composer
+        run: composer install --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+
+      - name: Execute tests via PHPUnit
+        run: vendor/bin/phpunit
