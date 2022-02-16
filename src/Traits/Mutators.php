@@ -50,4 +50,14 @@ trait Mutators
     {
         return [];
     }
+
+    /**
+     * Можно ли устанавливать значение колонки с глубиной вложенности напрямую.
+     *
+     * @return bool
+     */
+    public function canSetDepthColumn(): bool
+    {
+        return false;
+    }
 }
