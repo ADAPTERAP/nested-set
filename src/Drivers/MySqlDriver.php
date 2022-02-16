@@ -66,8 +66,10 @@ class MySqlDriver extends NestedSetDriver
                 )
             );
 
-            if ($this->model->canSetDepthColumn() && !array_key_exists($this->model->getDepthName(), $attributes)) {
+            if (!$this->model->canSetDepthColumn()) {
                 $attributes[$this->model->getDepthName()] = 0;
+            } else {
+                $attributes[$this->model->getDepthName()] ??= 0;
             }
 
             return $attributes;
