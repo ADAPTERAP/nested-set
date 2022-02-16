@@ -2,6 +2,7 @@
 
 namespace Adapterap\NestedSet\Tests;
 
+use Adapterap\NestedSet\Tests\Models\Product;
 use Adapterap\NestedSet\Handlers\NestedSetSyncTree;
 use Adapterap\NestedSet\Tests\Models\Attribute;
 use Adapterap\NestedSet\Tests\Models\Category;
@@ -67,6 +68,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
         $manager->bootEloquent();
 
         Category::createTable();
+        Product::createTable();
         Attribute::createTable();
         Menu::createTable();
         MenuItem::createTable();
