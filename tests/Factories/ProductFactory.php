@@ -10,13 +10,13 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * Class ProductFactory.
  *
- * @method Product|Product[]|Collection  create($attributes = [], ?Model $parent = null)
- * @method Product                       createOne($attributes = [])
- * @method Product[]|Collection          createMany(iterable $records)
- * @method Product[]|Collection          createChildren(Model $model)
- * @method Product|Product[]|Collection  make($attributes = [], ?Model $parent = null)
- * @method Product                       makeOne($attributes = [])
- * @method ProductFactory                state($state)
+ * @method Collection|Product|Product[] create($attributes = [], ?Model $parent = null)
+ * @method Product                      createOne($attributes = [])
+ * @method Collection|Product[]         createMany(iterable $records)
+ * @method Collection|Product[]         createChildren(Model $model)
+ * @method Collection|Product|Product[] make($attributes = [], ?Model $parent = null)
+ * @method Product                      makeOne($attributes = [])
+ * @method ProductFactory               state($state)
  */
 class ProductFactory extends Factory
 {

@@ -2,8 +2,8 @@
 
 namespace Adapterap\NestedSet\Tests\Feature;
 
-use Adapterap\NestedSet\Tests\Models\Product;
 use Adapterap\NestedSet\Tests\Models\Category;
+use Adapterap\NestedSet\Tests\Models\Product;
 use Adapterap\NestedSet\Tests\TestCase;
 
 /**
@@ -43,7 +43,7 @@ class SyncTreeTest extends TestCase
     }
 
     /**
-     * Проверяет синхронизацию дерева при изменении `depth` вручную
+     * Проверяет синхронизацию дерева при изменении `depth` вручную.
      */
     public function testSyncWithSetDepth(): void
     {

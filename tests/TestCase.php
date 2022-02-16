@@ -2,12 +2,12 @@
 
 namespace Adapterap\NestedSet\Tests;
 
-use Adapterap\NestedSet\Tests\Models\Product;
 use Adapterap\NestedSet\Handlers\NestedSetSyncTree;
 use Adapterap\NestedSet\Tests\Models\Attribute;
 use Adapterap\NestedSet\Tests\Models\Category;
 use Adapterap\NestedSet\Tests\Models\Menu;
 use Adapterap\NestedSet\Tests\Models\MenuItem;
+use Adapterap\NestedSet\Tests\Models\Product;
 use Carbon\Carbon;
 use Dotenv\Dotenv;
 use Illuminate\Database\Capsule\Manager;
