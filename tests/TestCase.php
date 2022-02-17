@@ -7,6 +7,7 @@ use Adapterap\NestedSet\Tests\Models\Attribute;
 use Adapterap\NestedSet\Tests\Models\Category;
 use Adapterap\NestedSet\Tests\Models\Menu;
 use Adapterap\NestedSet\Tests\Models\MenuItem;
+use Adapterap\NestedSet\Tests\Models\Product;
 use Carbon\Carbon;
 use Dotenv\Dotenv;
 use Illuminate\Database\Capsule\Manager;
@@ -67,6 +68,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
         $manager->bootEloquent();
 
         Category::createTable();
+        Product::createTable();
         Attribute::createTable();
         Menu::createTable();
         MenuItem::createTable();
