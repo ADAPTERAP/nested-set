@@ -100,7 +100,7 @@ class NestedSetSyncTree
         foreach ($values as $index => $item) {
             $parts = [];
 
-            foreach ($this->stub->getNestedGroupBy() as $fieldName) {
+            foreach ($this->stub->getScopeAttributes() as $fieldName) {
                 $parts[] = $item[$fieldName] ?? [];
             }
 
@@ -266,7 +266,7 @@ class NestedSetSyncTree
         $parts = [];
         $attributes = $item instanceof Model ? $item->getAttributes() : (array) $item;
 
-        foreach ($this->stub->getNestedGroupBy() as $fieldName) {
+        foreach ($this->stub->getScopeAttributes() as $fieldName) {
             $parts[] = $item[$fieldName] ?? null;
         }
 
