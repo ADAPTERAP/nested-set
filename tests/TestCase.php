@@ -78,7 +78,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
     public function setUp(): void
     {
         $this->app = $this->createApplication();
-        $this->app->bind('db', fn () => Manager::connection('default'));
+        $this->app->bind('db', fn() => Manager::connection('default'));
 
         parent::setUp();
 
@@ -223,11 +223,22 @@ class TestCase extends \Orchestra\Testbench\TestCase
      */
     protected function assertDatabaseHas($table, array $data, $connection = null)
     {
-        self::assertTrue(
-            Manager::table($table)
-                ->where($data)
-                ->exists()
-        );
+        $result = Manager::table($table)
+            ->where($data)
+            ->exists();
+
+        if ($result === false) {
+            $this->fail(
+                sprintf(
+                    'Can not find a row in the database: %s%s%s',
+                    $table,
+                    PHP_EOL,
+                    print_r($data, true)
+                )
+            );
+        } else {
+            self::assertTrue(true);
+        }
 
         return $this;
     }

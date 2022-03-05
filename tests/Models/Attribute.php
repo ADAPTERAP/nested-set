@@ -2,6 +2,7 @@
 
 namespace Adapterap\NestedSet\Tests\Models;
 
+use Adapterap\NestedSet\Contracts\NestedSetModel;
 use Adapterap\NestedSet\NestedSetModelTrait;
 use Adapterap\NestedSet\Tests\Factories\AttributeFactory;
 use Carbon\Carbon;
@@ -24,7 +25,7 @@ use Illuminate\Database\Schema\Blueprint;
  * @property Carbon      $updated_at
  * @property null|Carbon $deleted_at
  */
-class Attribute extends Model
+class Attribute extends Model implements NestedSetModel
 {
     use SoftDeletes;
     use HasFactory;
@@ -99,7 +100,7 @@ class Attribute extends Model
      *
      * @return array
      */
-    public function getNestedGroupBy(): array
+    public function getScopeAttributes(): array
     {
         return ['place'];
     }
