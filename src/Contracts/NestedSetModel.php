@@ -16,11 +16,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 
 /**
- * @property-read Collection $parents
- * @property-read Collection $children
- * @property-read Collection $descendants
- * @property-read Collection $ancestors
- * @property-read Collection $siblings
  * @property-read bool       $is_root
  * @property-read bool       $is_child
  * @property-read bool       $has_children
