@@ -15,7 +15,7 @@ trait Tree
     /**
      * Синхронизирует дерево.
      *
-     * @param $values
+     * @param              $values
      * @param array        $uniqueBy
      * @param null|array   $update
      * @param null|Closure $map
