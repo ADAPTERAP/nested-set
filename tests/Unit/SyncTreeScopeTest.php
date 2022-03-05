@@ -1,6 +1,6 @@
 <?php
 
-namespace Adapterap\NestedSet\Tests\Feature;
+namespace Adapterap\NestedSet\Tests\Unit;
 
 use Adapterap\NestedSet\Tests\Models\Menu;
 use Adapterap\NestedSet\Tests\Models\MenuItem;
@@ -51,7 +51,14 @@ class SyncTreeScopeTest extends TestCase
      */
     protected function asserts(array $tree, int $lft = 0, int $depth = 0): void
     {
+        $previousMenuId = null;
+
         foreach ($tree as $item) {
+            if ($depth === 0 && $previousMenuId !== $item['menu_id']) {
+                $lft = 0;
+            }
+
+            $previousMenuId = $item['menu_id'];
             $rgt = $lft + $this->getCountDescendants($item) * 2 + 1;
 
             $this->assertDatabaseHas('menu_items', [

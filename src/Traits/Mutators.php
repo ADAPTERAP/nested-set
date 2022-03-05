@@ -42,16 +42,6 @@ trait Mutators
     }
 
     /**
-     * Возвращает массив полей объединяющих узлы.
-     *
-     * @return array
-     */
-    public function getScopeAttributes(): array
-    {
-        return [];
-    }
-
-    /**
      * Можно ли устанавливать значение колонки с глубиной вложенности напрямую.
      *
      * @return bool

@@ -2,6 +2,7 @@
 
 namespace Adapterap\NestedSet\Tests\Models;
 
+use Adapterap\NestedSet\Contracts\NestedSetModel;
 use Adapterap\NestedSet\NestedSetModelTrait;
 use Adapterap\NestedSet\Tests\Factories\MenuItemFactory;
 use Illuminate\Database\Capsule\Manager;
@@ -20,7 +21,7 @@ use Illuminate\Database\Schema\Blueprint;
  *
  * @method static MenuItemFactory factory(...$parameters)
  */
-class MenuItem extends Model
+class MenuItem extends Model implements NestedSetModel
 {
     use NestedSetModelTrait;
     use HasFactory;
@@ -33,6 +34,11 @@ class MenuItem extends Model
      */
     public $timestamps = false;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var string[]
+     */
     protected $fillable = [
         'name',
         'menu_id',

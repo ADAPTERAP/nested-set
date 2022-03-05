@@ -2,6 +2,7 @@
 
 namespace Adapterap\NestedSet\Tests\Models;
 
+use Adapterap\NestedSet\Contracts\NestedSetModel;
 use Adapterap\NestedSet\NestedSetModelTrait;
 use Adapterap\NestedSet\Tests\Factories\CategoryFactory;
 use Carbon\Carbon;
@@ -24,7 +25,7 @@ use Illuminate\Database\Schema\Blueprint;
  * @property int         $depth
  * @property null|Carbon $deleted_at
  */
-class Category extends Model
+class Category extends Model implements NestedSetModel
 {
     use NestedSetModelTrait;
     use HasFactory;

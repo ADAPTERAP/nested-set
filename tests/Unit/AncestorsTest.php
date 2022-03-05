@@ -1,6 +1,6 @@
 <?php
 
-namespace Adapterap\NestedSet\Tests\Feature;
+namespace Adapterap\NestedSet\Tests\Unit;
 
 use Adapterap\NestedSet\Relations\AncestorsRelation;
 use Adapterap\NestedSet\Tests\Models\Category;
