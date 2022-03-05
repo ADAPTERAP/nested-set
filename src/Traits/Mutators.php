@@ -40,14 +40,4 @@ trait Mutators
     {
         return $this->getLft() + 1 < $this->getRgt();
     }
-
-    /**
-     * Возвращает массив полей объединяющих узлы.
-     *
-     * @return array
-     */
-    public function getScopeAttributes(): array
-    {
-        return [];
-    }
 }

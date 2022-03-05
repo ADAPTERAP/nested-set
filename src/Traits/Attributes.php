@@ -97,11 +97,11 @@ trait Attributes
     }
 
     /**
-     * Возвращает названия полей по которым необходимо сгруппировать деревья.
+     * Возвращает массив полей объединяющих узлы.
      *
      * @return array
      */
-    public function getNestedGroupBy(): array
+    public function getScopeAttributes(): array
     {
         return [];
     }
