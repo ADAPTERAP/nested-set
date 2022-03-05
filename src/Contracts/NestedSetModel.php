@@ -167,8 +167,9 @@ interface NestedSetModel
     /**
      * Set the given relationship on the model.
      *
-     * @param  string  $relation
-     * @param  mixed  $value
+     * @param string $relation
+     * @param mixed  $value
+     *
      * @return $this
      */
     public function setRelation($relation, $value);
