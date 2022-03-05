@@ -8,12 +8,15 @@ use Adapterap\NestedSet\Tests\TestCase;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
 
+/**
+ * @internal
+ * @coversNothing
+ */
 class NestedSetConvertDescendantsToChildrenTest extends TestCase
 {
     /**
      * Проверяет корректность разбиения потомков на дерево из детей.
      *
-     * @return void
      * @throws Exception
      */
     public function test(): void
@@ -30,8 +33,9 @@ class NestedSetConvertDescendantsToChildrenTest extends TestCase
     /**
      * Подготавливает данные для теста.
      *
-     * @return Collection
      * @throws Exception
+     *
+     * @return Collection
      */
     private function arrange(): Collection
     {
@@ -47,8 +51,6 @@ class NestedSetConvertDescendantsToChildrenTest extends TestCase
      * Рекурсивно создает дочерние элементы для указанной модели.
      *
      * @param MenuItem $parent
-     *
-     * @return void
      *
      * @throws Exception
      */
@@ -73,8 +75,6 @@ class NestedSetConvertDescendantsToChildrenTest extends TestCase
      * Проверяет корректность данных в коллекции.
      *
      * @param Collection $menuItems
-     *
-     * @return void
      */
     private function asserts(Collection $menuItems): void
     {
@@ -88,8 +88,6 @@ class NestedSetConvertDescendantsToChildrenTest extends TestCase
      * Проверяет корректность данных в указанном пункте меню.
      *
      * @param MenuItem $menuItem
-     *
-     * @return void
      */
     private function assertMenuItem(MenuItem $menuItem): void
     {

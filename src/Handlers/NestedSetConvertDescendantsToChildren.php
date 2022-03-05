@@ -12,14 +12,13 @@ class NestedSetConvertDescendantsToChildren
      * Раскладывает дочерние элементы по связям "children".
      *
      * @param Collection $items
-     *
-     * @return void
      */
     public function handle(Collection $items): void
     {
         foreach ($items as $item) {
             if ($item instanceof Collection) {
                 $this->handle($item);
+
                 continue;
             }
 
@@ -43,8 +42,6 @@ class NestedSetConvertDescendantsToChildren
      *
      * @param Collection $children
      * @param Collection $descendants
-     *
-     * @return void
      */
     private function recursively(Collection $children, Collection $descendants): void
     {
