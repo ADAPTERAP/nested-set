@@ -66,7 +66,11 @@ class MySqlDriver extends NestedSetDriver
                 )
             );
 
-            $attributes[$this->model->getDepthName()] = 0;
+            if (!$this->model->canSetDepthColumn()) {
+                $attributes[$this->model->getDepthName()] = 0;
+            } else {
+                $attributes[$this->model->getDepthName()] ??= 0;
+            }
 
             return $attributes;
         }
@@ -286,7 +290,7 @@ class MySqlDriver extends NestedSetDriver
     protected function getWithClauseForRebaseSubTree(): string
     {
         return '
-            WITH 
+            WITH
                 # Информация о рутовом элементе перемещаемого поддерева
                 `item` AS (SELECT `id`, `lft`, `rgt`, `depth` FROM `table` WHERE `id` = ?`scopes`),
                 # Информация о родительском элементе, внутрь которого перемещается поддерево
@@ -322,50 +326,50 @@ class MySqlDriver extends NestedSetDriver
         return '
             SET
                 `parent_id` = IF(id = (SELECT id FROM `item`), (SELECT id FROM `newParent`), `parent_id`),
-                `depth` = 
+                `depth` =
                     CASE
                         WHEN exists (SELECT 1 FROM `tree` WHERE `tree`.id = t.id)
                             THEN `depth` - (SELECT `depth` FROM `item`) + (SELECT `depth` FROM `newParent`) + 1
                         ELSE `depth`
                     END,
-                `lft` = 
+                `lft` =
                     CASE
                         # предки при перемещении вниз
                         WHEN (SELECT `lft` FROM `item`) < (SELECT `lft` FROM `newParent`) AND `lft` > (SELECT `lft` FROM `item`) AND `lft` < (SELECT `rgt` FROM `newParent`) AND `rgt` > (SELECT `rgt` FROM `item`)
                             THEN `lft` - (SELECT `ancestorsLft` FROM `coefficients`)
-    
+
                         # предки при перемещении вверх
                         WHEN (SELECT `lft` FROM `item`) > (SELECT `lft` FROM `newParent`) AND `lft` < (SELECT `lft` FROM `item`) AND `lft` > (SELECT `rgt` FROM `newParent`)
                             THEN `lft` + (SELECT `ancestorsLft` FROM `coefficients`)
-    
+
                         # перемещаемое дерево при перемещении вниз
                         WHEN (SELECT `lft` FROM `item`) < (SELECT `lft` FROM `newParent`) AND EXISTS (SELECT 1 FROM `tree` WHERE `tree`.id = `t`.`id`)
                             THEN `lft` + (SELECT `subTreeLft` FROM `coefficients`)
-    
+
                         # элементы перемещаемого дерева при меремещении вверх
                         WHEN (SELECT `lft` FROM `item`) > (SELECT `lft` FROM `newParent`) AND EXISTS (SELECT 1 FROM `tree` WHERE `tree`.`id` = `t`.`id`)
                             THEN `lft` - (SELECT `subTreeLft` FROM `coefficients`)
-    
+
                         ELSE `lft`
                     END,
-                `rgt` = 
+                `rgt` =
                     CASE
                         # предки при перемещении вниз
                         WHEN (SELECT `lft` FROM `item`) < (SELECT `lft` FROM `newParent`) AND `rgt` > (SELECT `rgt` FROM `item`) AND `rgt` < (SELECT `rgt` FROM `newParent`)
                             THEN `rgt` - (SELECT `ancestorsLft` FROM `coefficients`)
-                        
+
                         # предки при перемещении вверх
                         WHEN (SELECT `lft` FROM `item`) > (SELECT `lft` FROM `newParent`) AND `rgt` < (SELECT `lft` FROM `item`) AND `rgt` >= (SELECT `rgt` FROM `newParent`)
                             THEN `rgt` + (SELECT `ancestorsLft` FROM `coefficients`)
-                        
+
                         # дерево при перемещении вниз
                         WHEN (SELECT `lft` FROM `item`) < (SELECT `lft` FROM `newParent`) AND EXISTS (SELECT 1 FROM `tree` WHERE `tree`.id = t.id)
                             THEN `rgt` + (SELECT `subTreeLft` FROM `coefficients`)
-                        
+
                         # дерево при перемещении вверх
                         WHEN (SELECT `lft` FROM `item`) > (SELECT `lft` FROM `newParent`) AND EXISTS (SELECT 1 FROM `tree` WHERE `tree`.id = t.id)
                             THEN `rgt` - (SELECT `subTreeLft` FROM `coefficients`)
-                        
+
                         ELSE `rgt`
                     END
         ';
@@ -379,11 +383,11 @@ class MySqlDriver extends NestedSetDriver
     protected function getWhereClauseForRebaseSubTree(): string
     {
         return '
-            WHERE 
-                (SELECT `lft` FROM `item`) < (SELECT `lft` FROM `newParent`) 
+            WHERE
+                (SELECT `lft` FROM `item`) < (SELECT `lft` FROM `newParent`)
                     AND (`lft` >= (SELECT `lft` FROM `item`) OR `rgt` <= (SELECT `rgt` FROM `newParent`))
                 OR (
-                    (SELECT `lft` FROM `item`) > (SELECT `lft` FROM `newParent`) 
+                    (SELECT `lft` FROM `item`) > (SELECT `lft` FROM `newParent`)
                         AND (`lft` <= (SELECT `lft` FROM `item`) OR `rgt` >= (SELECT `rgt` FROM `newParent`))
                 )
         ';

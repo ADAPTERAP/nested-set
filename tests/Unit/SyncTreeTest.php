@@ -3,6 +3,7 @@
 namespace Adapterap\NestedSet\Tests\Unit;
 
 use Adapterap\NestedSet\Tests\Models\Category;
+use Adapterap\NestedSet\Tests\Models\Product;
 use Adapterap\NestedSet\Tests\TestCase;
 
 /**
@@ -38,6 +39,25 @@ class SyncTreeTest extends TestCase
         $this->assertDatabaseMissing('categories', [
             'id' => $categoryWillBeDelete->id,
             'deleted_at' => null,
+        ]);
+    }
+
+    /**
+     * Проверяет синхронизацию дерева при изменении `depth` вручную.
+     */
+    public function testSyncWithSetDepth(): void
+    {
+        $product = Product::factory()->create([
+            'depth' => 2,
+        ]);
+
+        $tree = $this->getRawTree();
+        Category::syncTree($tree, ['name'], ['name']);
+        $this->asserts($tree);
+
+        $this->assertDatabaseHas('products', [
+            'id' => $product->id,
+            'depth' => 2,
         ]);
     }
 

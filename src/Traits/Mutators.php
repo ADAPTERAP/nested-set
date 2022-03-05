@@ -40,4 +40,14 @@ trait Mutators
     {
         return $this->getLft() + 1 < $this->getRgt();
     }
+
+    /**
+     * Можно ли устанавливать значение колонки с глубиной вложенности напрямую.
+     *
+     * @return bool
+     */
+    public function canSetDepthColumn(): bool
+    {
+        return false;
+    }
 }
