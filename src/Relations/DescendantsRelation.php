@@ -64,7 +64,8 @@ class DescendantsRelation extends BaseRelation
 
         return $builder
             ->where($lftName, '>', new Expression("(SELECT `{$lftName}` FROM `{$tableName}` WHERE `{$primaryName}` = {$primary})"))
-            ->where($rgtName, '<', new Expression("(SELECT `{$rgtName}` FROM `{$tableName}` WHERE `{$primaryName}` = {$primary})"));
+            ->where($rgtName, '<', new Expression("(SELECT `{$rgtName}` FROM `{$tableName}` WHERE `{$primaryName}` = {$primary})"))
+            ->orderBy($lftName);
     }
 
     /**
