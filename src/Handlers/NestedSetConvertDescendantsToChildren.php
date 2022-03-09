@@ -23,16 +23,12 @@ class NestedSetConvertDescendantsToChildren
             }
 
             if ($item instanceof NestedSetModel) {
-                $roots = $item->descendants->whereNull($item->getParentIdName());
-                $item->setRelation('children', $roots);
+                $item->setRelation(
+                    'children',
+                    $item->descendants->where($item->getParentIdName(), $item->getKey())
+                );
 
-                /** @var NestedSetModel $child */
-                foreach ($item->children as $child) {
-                    $child->setRelation(
-                        'children',
-                        $item->descendants->where($item->getParentIdName(), $child->getKey())
-                    );
-                }
+                $this->recursively($item->children, $item->descendants);
             }
         }
     }
@@ -41,7 +37,7 @@ class NestedSetConvertDescendantsToChildren
      * Рекурсивно определяет дочерние элементы.
      *
      * @param Collection $children
-     * @param Collection $descendants
+     * @param Collection $descendants Весь список потомков
      */
     private function recursively(Collection $children, Collection $descendants): void
     {
