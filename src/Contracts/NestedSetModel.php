@@ -16,9 +16,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 
 /**
- * @property-read bool       $is_root
- * @property-read bool       $is_child
- * @property-read bool       $has_children
+ * @property-read bool $is_root
+ * @property-read bool $is_child
+ * @property-read bool $has_children
  */
 interface NestedSetModel
 {
