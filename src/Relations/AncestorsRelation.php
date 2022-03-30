@@ -69,9 +69,12 @@ class AncestorsRelation extends BaseRelation
         $primaryName = $model->getKeyName();
         $primary = $model->getAttribute($primaryName);
 
-        return $builder
+        $builder
             ->where($lftName, '<', new Expression("(SELECT `{$lftName}` FROM `{$tableName}` WHERE `{$primaryName}` = {$primary})"))
-            ->where($rgtName, '>', new Expression("(SELECT `{$rgtName}` FROM `{$tableName}` WHERE `{$primaryName}` = {$primary})"));
+            ->where($rgtName, '>', new Expression("(SELECT `{$rgtName}` FROM `{$tableName}` WHERE `{$primaryName}` = {$primary})"))
+            ->orderByDesc($lftName);
+
+        return self::addScopeFilter($builder, $model);
     }
 
     /**
