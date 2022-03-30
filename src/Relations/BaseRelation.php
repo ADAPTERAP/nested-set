@@ -119,4 +119,25 @@ abstract class BaseRelation extends Relation
      * @return Builder
      */
     abstract protected static function addFiltersForModel(Builder $builder, Model $model): Builder;
+
+    /**
+     * Добавляет в фильтр билдера scopes.
+     *
+     * @param Builder $builder
+     * @param Model   $model
+     *
+     * @return Builder
+     */
+    protected static function addScopeFilter(Builder $builder, Model $model): Builder
+    {
+        $scopes = $model->getScopeAttributes();
+
+        foreach ($scopes as $scope) {
+            $scopeValue = $model->getAttribute($scope);
+
+            $builder->where($scope, $scopeValue);
+        }
+
+        return $builder;
+    }
 }
