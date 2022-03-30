@@ -2,11 +2,13 @@
 
 namespace Adapterap\NestedSet\Relations;
 
+use Illuminate\Support\Arr;
 use Adapterap\NestedSet\NestedSetModelTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Adapterap\NestedSet\Exceptions\NestedSetModelHasNoScope;
 
 /**
  * Class BaseRelation.
@@ -131,8 +133,13 @@ abstract class BaseRelation extends Relation
     protected static function addScopeFilter(Builder $builder, Model $model): Builder
     {
         $scopes = $model->getScopeAttributes();
+        $attributes = $model->getAttributes();
 
         foreach ($scopes as $scope) {
+            if (!Arr::exists($attributes, $scope)) {
+                throw new NestedSetModelHasNoScope($model, $scope);
+            }
+
             $scopeValue = $model->getAttribute($scope);
 
             $builder->where($scope, $scopeValue);

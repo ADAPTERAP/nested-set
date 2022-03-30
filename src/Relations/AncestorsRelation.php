@@ -72,7 +72,7 @@ class AncestorsRelation extends BaseRelation
         $builder
             ->where($lftName, '<', new Expression("(SELECT `{$lftName}` FROM `{$tableName}` WHERE `{$primaryName}` = {$primary})"))
             ->where($rgtName, '>', new Expression("(SELECT `{$rgtName}` FROM `{$tableName}` WHERE `{$primaryName}` = {$primary})"))
-            ->orderBy($lftName);
+            ->orderByDesc($lftName);
 
         return self::addScopeFilter($builder, $model);
     }
