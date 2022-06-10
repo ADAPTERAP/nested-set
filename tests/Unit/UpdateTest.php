@@ -17,6 +17,7 @@ class UpdateTest extends TestCase
 {
     /**
      * Попытка переместить элемент вниз по дереву.
+     *
      * @group 123
      */
     public function testRebaseDownChild(): void
@@ -51,11 +52,11 @@ class UpdateTest extends TestCase
 //        $this->assertDatabaseHas('categories', ['id' => $child21->id, 'lft' => 5, 'rgt' => 8, 'depth' => 1]);
 
         dd([
-//            'query' => ['id' => $target->id, 'lft' => 6, 'rgt' => 7, 'depth' => 2, 'name' => '2.1.1'],
-//            'queries' => DB::getQueryLog(),
+            //            'query' => ['id' => $target->id, 'lft' => 6, 'rgt' => 7, 'depth' => 2, 'name' => '2.1.1'],
+            //            'queries' => DB::getQueryLog(),
             'target_id' => $target->id,
             '$child21->id' => $child21->id,
-//            'before' => $categories,
+            //            'before' => $categories,
             'after' => DB::table('categories')->get()->toArray(),
             'item' => DB::select('
                 WITH 
