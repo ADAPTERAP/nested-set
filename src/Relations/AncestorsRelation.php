@@ -121,7 +121,7 @@ class AncestorsRelation extends BaseRelation
 
         /** @var Model|NestedSetModelTrait $model */
         foreach ($models as $model) {
-            if ((string)$model->getKey() === (string)$parentId) {
+            if ((string) $model->getKey() === (string) $parentId) {
                 $result->push($model);
 
                 if ($model->getParentId() !== null) {
