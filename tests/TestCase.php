@@ -9,7 +9,6 @@ use Adapterap\NestedSet\Tests\Models\Menu;
 use Adapterap\NestedSet\Tests\Models\MenuItem;
 use Adapterap\NestedSet\Tests\Models\Product;
 use Carbon\Carbon;
-use Dotenv\Dotenv;
 use Illuminate\Database\Capsule\Manager;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Application;
@@ -46,21 +45,35 @@ class TestCase extends \Orchestra\Testbench\TestCase
             return;
         }
 
+        //        self::$isConfiguredManager = true;
+        //
+        //        $dotenv = Dotenv::createImmutable(dirname(__DIR__));
+        //        $dotenv->load();
+        //
+        //        $manager = new Manager();
+        //        $manager->addConnection([
+        //            'driver' => 'mysql',
+        //            'host' => env('DB_HOST', 'mysqldb'),
+        //            'port' => env('DB_PORT', 3306),
+        //            'database' => env('DB_DATABASE', 'nested'),
+        //            'username' => env('DB_USERNAME', 'root'),
+        //            'password' => env('DB_PASSWORD', 'password'),
+        //            'charset' => 'utf8',
+        //            'collation' => 'utf8_unicode_ci',
+        //        ]);
+
         self::$isConfiguredManager = true;
 
-        $dotenv = Dotenv::createImmutable(dirname(__DIR__));
-        $dotenv->load();
+        $databasePath = dirname(__DIR__) . '/database.sqlite';
+        touch($databasePath);
 
         $manager = new Manager();
         $manager->addConnection([
-            'driver' => 'mysql',
-            'host' => env('DB_HOST', 'mysqldb'),
-            'port' => env('DB_PORT', 3306),
-            'database' => env('DB_DATABASE', 'nested'),
-            'username' => env('DB_USERNAME', 'root'),
-            'password' => env('DB_PASSWORD', 'password'),
-            'charset' => 'utf8',
-            'collation' => 'utf8_unicode_ci',
+            'driver' => 'sqlite',
+            'url' => null,
+            'database' => $databasePath,
+            'prefix' => '',
+            'foreign_key_constraints' => true,
         ]);
 
         // Позволяет использовать статичные вызовы при работе с Capsule.
@@ -80,7 +93,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
     public function setUp(): void
     {
         $this->app = $this->createApplication();
-        $this->app->bind('db', fn () => Manager::connection('default'));
+        $this->app->bind('db', fn() => Manager::connection('default'));
 
         parent::setUp();
 
