@@ -65,7 +65,7 @@ class UpdateTest extends TestCase
                      diffBetweenRgtAndLft AS (SELECT (SELECT rgt FROM item) - (SELECT lft FROM item) AS diff),
                      coefficients AS (SELECT (SELECT diff FROM diffBetweenRgtAndLft) + 1 AS ancestorsLft, CASE WHEN (SELECT lft FROM item) < (SELECT lft FROM newParent) THEN (SELECT lft FROM newParent) - (SELECT diff FROM diffBetweenRgtAndLft) - (SELECT lft FROM item) WHEN (SELECT lft FROM item) > (SELECT lft FROM newParent) then (SELECT lft FROM item) - (SELECT lft FROM newParent) - 1 ELSE 1 END AS subTreeLft)
                 SELECT * FROM item                    
-            '),
+            ', [$target->id, $target->id]),
             'newParent' => DB::select('
                 WITH 
                     item AS (SELECT id, lft, rgt, depth FROM categories WHERE id = ?),
@@ -74,7 +74,7 @@ class UpdateTest extends TestCase
                      diffBetweenRgtAndLft AS (SELECT (SELECT rgt FROM item) - (SELECT lft FROM item) AS diff),
                      coefficients AS (SELECT (SELECT diff FROM diffBetweenRgtAndLft) + 1 AS ancestorsLft, CASE WHEN (SELECT lft FROM item) < (SELECT lft FROM newParent) THEN (SELECT lft FROM newParent) - (SELECT diff FROM diffBetweenRgtAndLft) - (SELECT lft FROM item) WHEN (SELECT lft FROM item) > (SELECT lft FROM newParent) then (SELECT lft FROM item) - (SELECT lft FROM newParent) - 1 ELSE 1 END AS subTreeLft)
                 SELECT * FROM newParent                    
-            '),
+            ', [$target->id, $target->id]),
             'tree' => DB::select('
                 WITH 
                     item AS (SELECT id, lft, rgt, depth FROM categories WHERE id = ?),
@@ -83,7 +83,7 @@ class UpdateTest extends TestCase
                      diffBetweenRgtAndLft AS (SELECT (SELECT rgt FROM item) - (SELECT lft FROM item) AS diff),
                      coefficients AS (SELECT (SELECT diff FROM diffBetweenRgtAndLft) + 1 AS ancestorsLft, CASE WHEN (SELECT lft FROM item) < (SELECT lft FROM newParent) THEN (SELECT lft FROM newParent) - (SELECT diff FROM diffBetweenRgtAndLft) - (SELECT lft FROM item) WHEN (SELECT lft FROM item) > (SELECT lft FROM newParent) then (SELECT lft FROM item) - (SELECT lft FROM newParent) - 1 ELSE 1 END AS subTreeLft)
                 SELECT * FROM tree                    
-            '),
+            ', [$target->id, $target->id]),
             'diffBetweenRgtAndLft' => DB::select('
                 WITH 
                     item AS (SELECT id, lft, rgt, depth FROM categories WHERE id = ?),
@@ -92,7 +92,7 @@ class UpdateTest extends TestCase
                      diffBetweenRgtAndLft AS (SELECT (SELECT rgt FROM item) - (SELECT lft FROM item) AS diff),
                      coefficients AS (SELECT (SELECT diff FROM diffBetweenRgtAndLft) + 1 AS ancestorsLft, CASE WHEN (SELECT lft FROM item) < (SELECT lft FROM newParent) THEN (SELECT lft FROM newParent) - (SELECT diff FROM diffBetweenRgtAndLft) - (SELECT lft FROM item) WHEN (SELECT lft FROM item) > (SELECT lft FROM newParent) then (SELECT lft FROM item) - (SELECT lft FROM newParent) - 1 ELSE 1 END AS subTreeLft)
                 SELECT * FROM diffBetweenRgtAndLft                    
-            '),
+            ', [$target->id, $target->id]),
             'coefficients' => DB::select('
                 WITH 
                     item AS (SELECT id, lft, rgt, depth FROM categories WHERE id = ?),
@@ -101,7 +101,7 @@ class UpdateTest extends TestCase
                      diffBetweenRgtAndLft AS (SELECT (SELECT rgt FROM item) - (SELECT lft FROM item) AS diff),
                      coefficients AS (SELECT (SELECT diff FROM diffBetweenRgtAndLft) + 1 AS ancestorsLft, CASE WHEN (SELECT lft FROM item) < (SELECT lft FROM newParent) THEN (SELECT lft FROM newParent) - (SELECT diff FROM diffBetweenRgtAndLft) - (SELECT lft FROM item) WHEN (SELECT lft FROM item) > (SELECT lft FROM newParent) then (SELECT lft FROM item) - (SELECT lft FROM newParent) - 1 ELSE 1 END AS subTreeLft)
                 SELECT * FROM coefficients                    
-            '),
+            ', [$target->id, $target->id]),
         ]);
 
         $this->assertDatabaseHas('categories', ['id' => $target->id, 'lft' => 6, 'rgt' => 7, 'depth' => 2, 'name' => '2.1.1']);
