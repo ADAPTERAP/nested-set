@@ -38,13 +38,14 @@ class UpdateTest extends TestCase
         $this->assertDatabaseHas('categories', ['id' => $root3->id, 'lft' => 10, 'rgt' => 13, 'depth' => 0]);
         $this->assertDatabaseHas('categories', ['id' => $child31->id, 'lft' => 11, 'rgt' => 12, 'depth' => 1]);
 
+        DB::flushQueryLog();
         DB::enableQueryLog();
         $target->update(['parent_id' => $child21->id, 'name' => '2.1.1']);
 
-        $this->assertDatabaseHas('categories', ['id' => $root1->id, 'lft' => 0, 'rgt' => 3, 'depth' => 0]);
-        $this->assertDatabaseHas('categories', ['id' => $child11->id, 'lft' => 1, 'rgt' => 2, 'depth' => 1]);
-        $this->assertDatabaseHas('categories', ['id' => $root2->id, 'lft' => 4, 'rgt' => 9, 'depth' => 0]);
-        $this->assertDatabaseHas('categories', ['id' => $child21->id, 'lft' => 5, 'rgt' => 8, 'depth' => 1]);
+//        $this->assertDatabaseHas('categories', ['id' => $root1->id, 'lft' => 0, 'rgt' => 3, 'depth' => 0]);
+//        $this->assertDatabaseHas('categories', ['id' => $child11->id, 'lft' => 1, 'rgt' => 2, 'depth' => 1]);
+//        $this->assertDatabaseHas('categories', ['id' => $root2->id, 'lft' => 4, 'rgt' => 9, 'depth' => 0]);
+//        $this->assertDatabaseHas('categories', ['id' => $child21->id, 'lft' => 5, 'rgt' => 8, 'depth' => 1]);
 
         dd([
             'query' => ['id' => $target->id, 'lft' => 6, 'rgt' => 7, 'depth' => 2, 'name' => '2.1.1'],
