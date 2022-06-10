@@ -16,6 +16,10 @@ jobs:
 
       - name: Execute tests via PHPUnit
         run: vendor/bin/phpunit
+
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v3
         with:
           name: database.sqlite
-          path: database.sqlite
+          path: |
+            database.sqlite
