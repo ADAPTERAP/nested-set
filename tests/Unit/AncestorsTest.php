@@ -107,8 +107,8 @@ class AncestorsTest extends TestCase
                 'id' => $children->get(0)->id,
                 'categories' => DB::table('categories')->get(),
                 'ancestors' => DB::table('categories')
-                ->where('lft', '<', 5)
-                ->where('rgt', '<', 6)
+                    ->where('lft', '<', 5)
+                    ->where('rgt', '<', 6),
             ]);
         }
         self::assertCount(3, $children->get(0)->ancestors);
