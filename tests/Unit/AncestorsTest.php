@@ -69,6 +69,7 @@ class AncestorsTest extends TestCase
 
     /**
      * Проверка корректности работы load() в коллекции.
+     * @group 123
      */
     public function testLoadFromCollection(): void
     {
@@ -106,6 +107,7 @@ class AncestorsTest extends TestCase
                     ->where('lft', '<', 5)
                     ->where('rgt', '>', 6)
                     ->get(),
+                '$children->ancestors' => $children->toArray(),
             ]);
         }
         self::assertCount(3, $children->get(0)->ancestors);
