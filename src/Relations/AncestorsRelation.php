@@ -97,20 +97,37 @@ class AncestorsRelation extends BaseRelation
      */
     protected static function getAncestorIds(Model $model, Collection $relations): array
     {
-        /** @var Collection|Model[]|NestedSetModelTrait[] $ancestors */
-        $ancestors = clone $relations;
-        $result = [];
+        if ($model->getParentId() === null) {
+            return [];
+        }
 
-        foreach ($ancestors as $index => $ancestor) {
-            $ancestorId = $ancestor->getKey();
-            $modelParentId = $model->getParentId();
+        return self::getAncestorsRecursively($relations, $model->getParentId())
+            ->pluck($model->getKeyName())
+            ->unique()
+            ->toArray();
+    }
 
-            if ($modelParentId === $ancestorId) {
-                $result[] = $ancestorId;
-                $subAncestors = self::getAncestorIds($ancestor, $ancestors->forget($index));
+    /**
+     * Рекурсивно ищет предков по parent_id.
+     *
+     * @param Collection $models
+     * @param mixed      $parentId
+     *
+     * @return Collection
+     */
+    private static function getAncestorsRecursively(Collection $models, $parentId): Collection
+    {
+        $result = new Collection();
 
-                foreach ($subAncestors as $id) {
-                    $result[] = $id;
+        /** @var Model|NestedSetModelTrait $model */
+        foreach ($models as $model) {
+            if ($model->getKey() === $parentId) {
+                $result->push($model);
+
+                if ($model->getParentId() !== null) {
+                    foreach (self::getAncestorsRecursively($models, $model->getParentId()) as $ancestor) {
+                        $result->push($ancestor);
+                    }
                 }
             }
         }
