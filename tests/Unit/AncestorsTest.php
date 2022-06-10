@@ -92,15 +92,11 @@ class AncestorsTest extends TestCase
         ] = $this->createCategoryTree();
 
         $children = (new Category())->newCollection([$child1112, $child21, $child31]);
-        $children->load([
-            'ancestors' => function (AncestorsRelation $builder) {
-                $builder->orderByDesc('lft');
-            },
-        ]);
+        DB::enableQueryLog();
+        $children->load('ancestors');
 
         // child1112
         if ($children->get(0)->ancestors->isEmpty()) {
-            DB::enableQueryLog();
             $children->get(0)->ancestors()->get();
             dd([
                 'queries' => DB::getQueryLog(),
