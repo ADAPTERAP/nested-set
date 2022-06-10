@@ -160,7 +160,11 @@ trait Subscriber
         }
 
         foreach ($scopes as $scope) {
-            if ($this->getAttribute($scope) === ($parent ?? $this->parent)->getAttribute($scope)) {
+            // Приводим к строке, чтобы не было проблем с типизацией
+            $scopeValue = (string) $this->getAttribute($scope);
+            $parentValue = (string) ($parent ?? $this->parent)->getAttribute($scope);
+
+            if ($scopeValue === $parentValue) {
                 continue;
             }
 

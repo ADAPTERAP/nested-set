@@ -81,7 +81,7 @@ trait NestedSetModelTrait
      */
     protected function getNestedSetDriver(string $connectionName): NestedSetDriver
     {
-        if ($connectionName === 'mysql') {
+        if ($connectionName === 'mysql' || $connectionName === 'sqlite') {
             /** @var Model|NestedSetModelTrait $this */
             return new MySqlDriver($this);
         }

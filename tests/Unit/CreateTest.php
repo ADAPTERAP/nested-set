@@ -103,19 +103,21 @@ class CreateTest extends TestCase
             'menu_id' => $root->menu_id,
         ]);
 
-        $this->expectException(NestedSetCreateChildHasOtherScope::class);
+        try {
+            MenuItem::factory()->create([
+                'parent_id' => $root->id,
+            ]);
 
-        $child = MenuItem::factory()->create([
-            'parent_id' => $root->id,
-        ]);
-
-        $this->assertDatabaseMissing('menu_items', [
-            'id' => $child->id,
-            'lft' => 1,
-            'rgt' => 2,
-            'depth' => 1,
-            'parent_id' => $root->id,
-        ]);
+            $this->fail('Нельзя создавать элементы с разными scopes');
+        } catch (NestedSetCreateChildHasOtherScope $throwable) {
+            $this->assertDatabaseMissing($root->getTable(), [
+                'lft' => 1,
+                'rgt' => 2,
+                'depth' => 1,
+                'parent_id' => $root->id,
+                'menu_id' => $root->menu_id,
+            ]);
+        }
     }
 
     /**

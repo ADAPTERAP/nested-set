@@ -22,10 +22,10 @@ class MySqlDriver extends NestedSetDriver
     public function freshIndexesAfterInsert($primary, int $lft): void
     {
         $sql = '
-            UPDATE `table`
-                SET `lft` = IF(`lft` > ?, `lft` + 2, `lft`),
-                    `rgt` = IF(`rgt` >= ? AND `id` != ?, `rgt` + 2, `rgt`)
-                WHERE ((`rgt` >= ? AND `id` != ?) OR `lft` > ?)`scopes`
+            UPDATE $tableName
+                SET $lftName = CASE WHEN $lftName > ? THEN $lftName + 2 ELSE $lftName END,
+                    $rgtName = CASE WHEN $rgtName >= ? AND $idName != ? THEN $rgtName + 2 ELSE $rgtName END
+                WHERE (($rgtName >= ? AND $idName != ?) OR $lftName > ?)$scopes
         ';
 
         $this->model
@@ -54,14 +54,14 @@ class MySqlDriver extends NestedSetDriver
         if ($parentId === null) {
             $attributes[$this->model->getLftName()] = new Expression(
                 NestedSetQuery::prepare(
-                    '(SELECT `max` + 1 FROM (SELECT COALESCE(MAX(`rgt`), -1) AS `max` FROM `table` WHERE `parent_id` IS NULL`scopes`) t)',
+                    '(SELECT max + 1 FROM (SELECT COALESCE(MAX($rgtName), -1) AS max FROM $tableName WHERE $parentIdName IS NULL$scopes) t)',
                     $this->model
                 )
             );
 
             $attributes[$this->model->getRgtName()] = new Expression(
                 NestedSetQuery::prepare(
-                    '(SELECT `max` + 2 FROM (SELECT COALESCE(MAX(`rgt`), -1) AS `max` FROM `table` WHERE `parent_id` IS NULL`scopes`) t)',
+                    '(SELECT max + 2 FROM (SELECT COALESCE(MAX($rgtName), -1) AS max FROM $tableName WHERE $parentIdName IS NULL$scopes) t)',
                     $this->model
                 )
             );
@@ -77,21 +77,30 @@ class MySqlDriver extends NestedSetDriver
 
         $attributes[$this->model->getLftName()] = new Expression(
             NestedSetQuery::prepare(
-                "(SELECT `rgt` FROM (SELECT `rgt` FROM `table` WHERE `id` = {$parentId}`scopes`) t)",
+                sprintf(
+                    '(SELECT $rgtName FROM (SELECT $rgtName FROM $tableName WHERE $idName = %d$scopes) t)',
+                    $parentId
+                ),
                 $this->model
             )
         );
 
         $attributes[$this->model->getRgtName()] = new Expression(
             NestedSetQuery::prepare(
-                "(SELECT `rgt` + 1 FROM (SELECT `rgt` FROM `table` WHERE `id` = {$parentId}`scopes`) t)",
+                sprintf(
+                    '(SELECT $rgtName + 1 FROM (SELECT $rgtName FROM $tableName WHERE $idName = %d$scopes) t)',
+                    $parentId
+                ),
                 $this->model
             )
         );
 
         $attributes[$this->model->getDepthName()] = new Expression(
             NestedSetQuery::prepare(
-                "(SELECT `depth` + 1 FROM (SELECT `depth` FROM `table` WHERE `id` = {$parentId}`scopes`) t)",
+                sprintf(
+                    '(SELECT $depthName + 1 FROM (SELECT $depthName FROM $tableName WHERE $idName = %d$scopes) t)',
+                    $parentId
+                ),
                 $this->model
             )
         );
@@ -112,7 +121,7 @@ class MySqlDriver extends NestedSetDriver
     {
         $bindings = [$id, $parentId];
         $sql = $this->getWithClauseForRebaseSubTree()
-            . 'UPDATE `table` t '
+            . 'UPDATE $tableName AS t '
             . $this->getSetClauseForRebaseSubTree();
 
         // Добавляем в запрос обновление пользовательских значений
@@ -128,7 +137,7 @@ class MySqlDriver extends NestedSetDriver
                 continue;
             }
 
-            $sql .= ", `{$field}` = IF(`id` = (select `id` from `item`), ?, `{$field}`)";
+            $sql .= ", {$field} = CASE WHEN \$idName = (select \$idName from item) THEN ? ELSE {$field} END";
             $bindings[] = $value;
         }
 
@@ -176,10 +185,10 @@ class MySqlDriver extends NestedSetDriver
     public function forceDelete($primary): bool
     {
         $sql = '
-            WITH `item` AS (SELECT `lft`, `rgt` FROM `table` WHERE `id` = ?)
+            WITH item AS (SELECT $lftName, $rgtName FROM $tableName WHERE $idName = ?)
             DELETE
-            FROM `table`
-            WHERE `lft` >= (SELECT `lft` FROM `item`) AND `rgt` <= (SELECT `rgt` FROM `item`)`scopes`;
+            FROM $tableName
+            WHERE $lftName >= (SELECT $lftName FROM item) AND $rgtName <= (SELECT $rgtName FROM item)$scopes;
         ';
 
         return $this->model->getConnection()->statement(
@@ -199,10 +208,10 @@ class MySqlDriver extends NestedSetDriver
         $diff = $rgt - $lft + 1;
 
         $sql = '
-            UPDATE `table`
-            SET `lft` = IF(`lft` > ?, `lft` - ?, `lft`),
-                `rgt` = IF(`rgt` > ?, `rgt` - ?, `rgt`)
-            WHERE (`lft` > ? OR `rgt` > ?)`scopes`
+            UPDATE $tableName
+            SET $lftName = CASE WHEN $lftName > ? THEN $lftName - ? ELSE $lftName END,
+                $rgtName = CASE WHEN $rgtName > ? THEN $rgtName - ? ELSE $rgtName END
+            WHERE ($lftName > ? OR $rgtName > ?)$scopes
         ';
 
         $this->model->getConnection()->statement(
@@ -291,27 +300,27 @@ class MySqlDriver extends NestedSetDriver
     {
         return '
             WITH
-                # Информация о рутовом элементе перемещаемого поддерева
-                `item` AS (SELECT `id`, `lft`, `rgt`, `depth` FROM `table` WHERE `id` = ?`scopes`),
-                # Информация о родительском элементе, внутрь которого перемещается поддерево
-                `newParent` AS (SELECT `id`, `lft`, `rgt`, `depth` FROM `table` WHERE `id` = ?`scopes`),
-                # Список элементов, которые входят в перемещаемое поддерево
-                `tree` AS (SELECT `id` FROM `table` WHERE `lft` >= (SELECT `lft` FROM `item`) AND `rgt` <= (SELECT `rgt` FROM `item`)`scopes`),
-                # Разница между rgt и lft. Необходима для других запросов
-                `diffBetweenRgtAndLft` AS (
-                    SELECT (SELECT `rgt` FROM `item`) - (SELECT `lft` FROM `item`) AS `diff`
+                -- Информация о рутовом элементе перемещаемого поддерева
+                item AS (SELECT $idName, $lftName, $rgtName, $depthName FROM $tableName WHERE $idName = ?$scopes),
+                -- Информация о родительском элементе, внутрь которого перемещается поддерево
+                newParent AS (SELECT $idName, $lftName, $rgtName, $depthName FROM $tableName WHERE $idName = ?$scopes),
+                -- Список элементов, которые входят в перемещаемое поддерево
+                tree AS (SELECT $idName FROM $tableName WHERE $lftName >= (SELECT $lftName FROM item) AND $rgtName <= (SELECT $rgtName FROM item)$scopes),
+                -- Разница между rgt и lft. Необходима для других запросов
+                diffBetweenRgtAndLft AS (
+                    SELECT (SELECT $rgtName FROM item) - (SELECT $lftName FROM item) AS diff
                 ),
-                # Коэффициенты, для корректного подсчета lft/rgt
-                `coefficients` AS (
+                -- Коэффициенты, для корректного подсчета lft/rgt
+                coefficients AS (
                     SELECT
-                        (SELECT `diff` FROM `diffBetweenRgtAndLft`) + 1 AS `ancestorsLft`,
+                        (SELECT diff FROM diffBetweenRgtAndLft) + 1 AS ancestorsLft,
                         CASE
-                            WHEN (SELECT `lft` FROM `item`) < (SELECT `lft` FROM `newParent`)
-                                THEN (SELECT `lft` FROM `newParent`) - (SELECT `diff` FROM `diffBetweenRgtAndLft`) - (SELECT `lft` FROM `item`)
-                            WHEN (SELECT `lft` FROM `item`) > (SELECT `lft` FROM `newParent`)
-                                then (SELECT `lft` FROM `item`) - (SELECT `lft` FROM `newParent`) - 1
+                            WHEN (SELECT $lftName FROM item) < (SELECT $lftName FROM newParent)
+                                THEN (SELECT $lftName FROM newParent) - (SELECT diff FROM diffBetweenRgtAndLft) - (SELECT $lftName FROM item)
+                            WHEN (SELECT $lftName FROM item) > (SELECT $lftName FROM newParent)
+                                then (SELECT $lftName FROM item) - (SELECT $lftName FROM newParent) - 1
                             ELSE 1
-                        END AS `subTreeLft`
+                        END AS subTreeLft
                 )
         ';
     }
@@ -325,52 +334,52 @@ class MySqlDriver extends NestedSetDriver
     {
         return '
             SET
-                `parent_id` = IF(id = (SELECT id FROM `item`), (SELECT id FROM `newParent`), `parent_id`),
-                `depth` =
+                $parentIdName = CASE WHEN id = (SELECT id FROM item) THEN (SELECT id FROM newParent) ELSE $parentIdName END,
+                $depthName =
                     CASE
-                        WHEN exists (SELECT 1 FROM `tree` WHERE `tree`.id = t.id)
-                            THEN `depth` - (SELECT `depth` FROM `item`) + (SELECT `depth` FROM `newParent`) + 1
-                        ELSE `depth`
+                        WHEN exists (SELECT 1 FROM tree WHERE tree.id = t.id)
+                            THEN $depthName - (SELECT $depthName FROM item) + (SELECT $depthName FROM newParent) + 1
+                        ELSE $depthName
                     END,
-                `lft` =
+                $lftName =
                     CASE
-                        # предки при перемещении вниз
-                        WHEN (SELECT `lft` FROM `item`) < (SELECT `lft` FROM `newParent`) AND `lft` > (SELECT `lft` FROM `item`) AND `lft` < (SELECT `rgt` FROM `newParent`) AND `rgt` > (SELECT `rgt` FROM `item`)
-                            THEN `lft` - (SELECT `ancestorsLft` FROM `coefficients`)
+                        -- предки при перемещении вниз
+                        WHEN (SELECT $lftName FROM item) < (SELECT $lftName FROM newParent) AND $lftName > (SELECT $lftName FROM item) AND $lftName < (SELECT $rgtName FROM newParent) AND $rgtName > (SELECT $rgtName FROM item)
+                            THEN $lftName - (SELECT ancestorsLft FROM coefficients)
 
-                        # предки при перемещении вверх
-                        WHEN (SELECT `lft` FROM `item`) > (SELECT `lft` FROM `newParent`) AND `lft` < (SELECT `lft` FROM `item`) AND `lft` > (SELECT `rgt` FROM `newParent`)
-                            THEN `lft` + (SELECT `ancestorsLft` FROM `coefficients`)
+                        -- предки при перемещении вверх
+                        WHEN (SELECT $lftName FROM item) > (SELECT $lftName FROM newParent) AND $lftName < (SELECT $lftName FROM item) AND $lftName > (SELECT $rgtName FROM newParent)
+                            THEN $lftName + (SELECT ancestorsLft FROM coefficients)
 
-                        # перемещаемое дерево при перемещении вниз
-                        WHEN (SELECT `lft` FROM `item`) < (SELECT `lft` FROM `newParent`) AND EXISTS (SELECT 1 FROM `tree` WHERE `tree`.id = `t`.`id`)
-                            THEN `lft` + (SELECT `subTreeLft` FROM `coefficients`)
+                        -- перемещаемое дерево при перемещении вниз
+                        WHEN (SELECT $lftName FROM item) < (SELECT $lftName FROM newParent) AND EXISTS (SELECT 1 FROM tree WHERE tree.id = t.$idName)
+                            THEN $lftName + (SELECT subTreeLft FROM coefficients)
 
-                        # элементы перемещаемого дерева при меремещении вверх
-                        WHEN (SELECT `lft` FROM `item`) > (SELECT `lft` FROM `newParent`) AND EXISTS (SELECT 1 FROM `tree` WHERE `tree`.`id` = `t`.`id`)
-                            THEN `lft` - (SELECT `subTreeLft` FROM `coefficients`)
+                        -- элементы перемещаемого дерева при меремещении вверх
+                        WHEN (SELECT $lftName FROM item) > (SELECT $lftName FROM newParent) AND EXISTS (SELECT 1 FROM tree WHERE tree.$idName = t.$idName)
+                            THEN $lftName - (SELECT subTreeLft FROM coefficients)
 
-                        ELSE `lft`
+                        ELSE $lftName
                     END,
-                `rgt` =
+                $rgtName =
                     CASE
-                        # предки при перемещении вниз
-                        WHEN (SELECT `lft` FROM `item`) < (SELECT `lft` FROM `newParent`) AND `rgt` > (SELECT `rgt` FROM `item`) AND `rgt` < (SELECT `rgt` FROM `newParent`)
-                            THEN `rgt` - (SELECT `ancestorsLft` FROM `coefficients`)
+                        -- предки при перемещении вниз
+                        WHEN (SELECT $lftName FROM item) < (SELECT $lftName FROM newParent) AND $rgtName > (SELECT $rgtName FROM item) AND $rgtName < (SELECT $rgtName FROM newParent)
+                            THEN $rgtName - (SELECT ancestorsLft FROM coefficients)
 
-                        # предки при перемещении вверх
-                        WHEN (SELECT `lft` FROM `item`) > (SELECT `lft` FROM `newParent`) AND `rgt` < (SELECT `lft` FROM `item`) AND `rgt` >= (SELECT `rgt` FROM `newParent`)
-                            THEN `rgt` + (SELECT `ancestorsLft` FROM `coefficients`)
+                        -- предки при перемещении вверх
+                        WHEN (SELECT $lftName FROM item) > (SELECT $lftName FROM newParent) AND $rgtName < (SELECT $lftName FROM item) AND $rgtName >= (SELECT $rgtName FROM newParent)
+                            THEN $rgtName + (SELECT ancestorsLft FROM coefficients)
 
-                        # дерево при перемещении вниз
-                        WHEN (SELECT `lft` FROM `item`) < (SELECT `lft` FROM `newParent`) AND EXISTS (SELECT 1 FROM `tree` WHERE `tree`.id = t.id)
-                            THEN `rgt` + (SELECT `subTreeLft` FROM `coefficients`)
+                        -- дерево при перемещении вниз
+                        WHEN (SELECT $lftName FROM item) < (SELECT $lftName FROM newParent) AND EXISTS (SELECT 1 FROM tree WHERE tree.id = t.id)
+                            THEN $rgtName + (SELECT subTreeLft FROM coefficients)
 
-                        # дерево при перемещении вверх
-                        WHEN (SELECT `lft` FROM `item`) > (SELECT `lft` FROM `newParent`) AND EXISTS (SELECT 1 FROM `tree` WHERE `tree`.id = t.id)
-                            THEN `rgt` - (SELECT `subTreeLft` FROM `coefficients`)
+                        -- дерево при перемещении вверх
+                        WHEN (SELECT $lftName FROM item) > (SELECT $lftName FROM newParent) AND EXISTS (SELECT 1 FROM tree WHERE tree.id = t.id)
+                            THEN $rgtName - (SELECT subTreeLft FROM coefficients)
 
-                        ELSE `rgt`
+                        ELSE $rgtName
                     END
         ';
     }
@@ -384,11 +393,11 @@ class MySqlDriver extends NestedSetDriver
     {
         return '
             WHERE
-                (SELECT `lft` FROM `item`) < (SELECT `lft` FROM `newParent`)
-                    AND (`lft` >= (SELECT `lft` FROM `item`) OR `rgt` <= (SELECT `rgt` FROM `newParent`))
+                (SELECT $lftName FROM item) < (SELECT $lftName FROM newParent)
+                    AND ($lftName >= (SELECT $lftName FROM item) OR $rgtName <= (SELECT $rgtName FROM newParent))
                 OR (
-                    (SELECT `lft` FROM `item`) > (SELECT `lft` FROM `newParent`)
-                        AND (`lft` <= (SELECT `lft` FROM `item`) OR `rgt` >= (SELECT `rgt` FROM `newParent`))
+                    (SELECT $lftName FROM item) > (SELECT $lftName FROM newParent)
+                        AND ($lftName <= (SELECT $lftName FROM item) OR $rgtName >= (SELECT $rgtName FROM newParent))
                 )
         ';
     }

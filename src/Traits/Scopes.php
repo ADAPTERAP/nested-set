@@ -111,11 +111,11 @@ trait Scopes
         /** @var Model $this */
         return $builder
             ->whereRaw(
-                NestedSetQuery::prepare('`lft` > (SELECT `lft` FROM `table` WHERE `id` = ?)', $this),
+                NestedSetQuery::prepare('$lftName > (SELECT $lftName FROM $tableName WHERE $idName = ?)', $this),
                 [$primary]
             )
             ->whereRaw(
-                NestedSetQuery::prepare('`rgt` < (SELECT `rgt` FROM `table` WHERE `id` = ?)', $this),
+                NestedSetQuery::prepare('$rgtName < (SELECT $rgtName FROM $tableName WHERE $idName = ?)', $this),
                 [$primary]
             );
     }

@@ -86,7 +86,6 @@ class MenuItem extends Model implements NestedSetModel
             $table->unsignedBigInteger('lft');
             $table->unsignedBigInteger('rgt');
             $table->unsignedBigInteger('depth');
-            $table->timestamps();
             $table->softDeletes();
 
             $table->foreign('parent_id')

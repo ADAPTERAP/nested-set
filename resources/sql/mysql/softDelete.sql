@@ -1,41 +1,41 @@
-WITH `items` AS (/* filter */),
-     `deletingItemIds` AS (
-         SELECT `t`.`id`, `t`.`lft`, `t`.`rgt`
-         FROM `table` `t`
-                  JOIN `items` `i` ON `t`.`lft` >= `i`.`lft` AND `t`.`rgt` <= `i`.`rgt`
-        `whereScopes`
+WITH items AS (/* filter */),
+     deletingItemIds AS (
+         SELECT t.$idName, t.$lftName, t.$rgtName
+         FROM $tableName AS t
+                  JOIN items i ON t.$lftName >= i.$lftName AND t.$rgtName <= i.$rgtName
+        $whereScopes
      ),
-     `deletedAts` (`id`, `deleted_at`) AS (
-         SELECT `id`, NOW() FROM items
+     deletedAts ($idName, $deletedAtName) AS (
+         SELECT $idName, CURRENT_TIMESTAMP FROM items
      ),
-     `deletedAtsForDeletingItems` (`id`, `deleted_at`) AS (
-         SELECT `dii`.`id`, COALESCE(`da`.`deleted_at`, NOW())
-         FROM `deletingItemIds` `dii`
-                  LEFT JOIN `items` `i` ON `dii`.`lft` > `i`.`lft` AND `dii`.`rgt` < `i`.`rgt`
-                  LEFT JOIN `deletedAts` `da` ON `da`.`id` = `i`.`id` OR `dii`.`id` = `da`.`id`
+     deletedAtsForDeletingItems ($idName, $deletedAtName) AS (
+         SELECT dii.$idName, COALESCE(da.$deletedAtName, CURRENT_TIMESTAMP)
+         FROM deletingItemIds AS dii
+                  LEFT JOIN items i ON dii.$lftName > i.$lftName AND dii.$rgtName < i.$rgtName
+                  LEFT JOIN deletedAts da ON da.$idName = i.$idName OR dii.$idName = da.$idName
      )
-UPDATE `table` `t`
-SET `lft`= CASE
-               WHEN `deleted_at` IS NULL
-                   AND NOT EXISTS(SELECT 1 FROM `deletingItemIds` `dii` WHERE `dii`.`id` = `t`.`id`)
-                   AND EXISTS(SELECT 1 FROM `items` `i` WHERE `t`.`lft` > i.`lft`)
-                   THEN `lft` -
-                        (SELECT SUM(`i`.`rgt` - `i`.`lft` + 1) FROM `items` `i` WHERE `i`.`lft` < `t`.`lft`)
-               ELSE `lft`
+UPDATE $tableName AS t
+SET $lftName= CASE
+               WHEN $deletedAtName IS NULL
+                   AND NOT EXISTS(SELECT 1 FROM deletingItemIds AS dii WHERE dii.$idName = t.$idName)
+                   AND EXISTS(SELECT 1 FROM items AS i WHERE t.$lftName > i.$lftName)
+                   THEN $lftName -
+                        (SELECT SUM(i.$rgtName - i.$lftName + 1) FROM items AS i WHERE i.$lftName < t.$lftName)
+               ELSE $lftName
            END,
-    `rgt` = CASE
-               WHEN `deleted_at` IS NULL
-                   AND NOT EXISTS(SELECT 1 FROM `deletingItemIds` `dii` WHERE `dii`.`id` = `t`.`id`)
-                   AND EXISTS(SELECT 1 FROM `items` `i` WHERE `t`.`rgt` > `i`.`rgt`)
-                   THEN `rgt` -
-                        (SELECT SUM(`i`.`rgt` - `i`.`lft` + 1) FROM `items` `i` WHERE `i`.`rgt` < `t`.`rgt`)
-               ELSE `rgt`
+    $rgtName = CASE
+               WHEN $deletedAtName IS NULL
+                   AND NOT EXISTS(SELECT 1 FROM deletingItemIds AS dii WHERE dii.$idName = t.$idName)
+                   AND EXISTS(SELECT 1 FROM items AS i WHERE t.$rgtName > i.$rgtName)
+                   THEN $rgtName -
+                        (SELECT SUM(i.$rgtName - i.$lftName + 1) FROM items AS i WHERE i.$rgtName < t.$rgtName)
+               ELSE $rgtName
             END,
-    `deleted_at` = CASE
-                       WHEN EXISTS(SELECT 1 FROM `deletedAtsForDeletingItems` `dafdi` WHERE `dafdi`.`id` = `t`.`id`)
-                           THEN (SELECT `deleted_at`
-                                 FROM `deletedAtsForDeletingItems` `dafdi`
-                                 WHERE `dafdi`.`id` = `t`.`id`)
-                       ELSE `deleted_at`
+    $deletedAtName = CASE
+                       WHEN EXISTS(SELECT 1 FROM deletedAtsForDeletingItems AS dafdi WHERE dafdi.$idName = t.$idName)
+                           THEN (SELECT $deletedAtName
+                                 FROM deletedAtsForDeletingItems AS dafdi
+                                 WHERE dafdi.$idName = t.$idName)
+                       ELSE $deletedAtName
                    END
-`whereScopes`
+$whereScopes

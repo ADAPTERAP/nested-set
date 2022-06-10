@@ -3,10 +3,10 @@
 namespace Adapterap\NestedSet\Relations;
 
 use Adapterap\NestedSet\NestedSetModelTrait;
+use Adapterap\NestedSet\Support\NestedSetQuery;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Query\Expression;
 
 /**
  * Class AncestorsRelation.
@@ -64,15 +64,25 @@ class AncestorsRelation extends BaseRelation
     protected static function addFiltersForModel(Builder $builder, Model $model): Builder
     {
         $lftName = $model->getLftName();
-        $rgtName = $model->getRgtName();
-        $tableName = $model->getTable();
-        $primaryName = $model->getKeyName();
-        $primary = $model->getAttribute($primaryName);
+        $primary = $model->getKey();
 
         $builder
-            ->where($lftName, '<', new Expression("(SELECT `{$lftName}` FROM `{$tableName}` WHERE `{$primaryName}` = {$primary})"))
-            ->where($rgtName, '>', new Expression("(SELECT `{$rgtName}` FROM `{$tableName}` WHERE `{$primaryName}` = {$primary})"))
+            ->whereRaw(
+                NestedSetQuery::prepare('$lftName < (SELECT $lftName FROM $tableName WHERE $idName = ?)', $model),
+                [$primary]
+            )
+            ->whereRaw(
+                NestedSetQuery::prepare('$rgtName > (SELECT $rgtName FROM $tableName WHERE $idName = ?)', $model),
+                [$primary]
+            )
             ->orderByDesc($lftName);
+
+        foreach ($model->getScopeAttributes() as $scope) {
+            $builder->whereRaw(
+                NestedSetQuery::prepare($scope . ' = (SELECT ' . $scope . ' FROM $tableName WHERE $idName = ?)', $model),
+                [$primary]
+            );
+        }
 
         return self::addScopeFilter($builder, $model);
     }
@@ -87,20 +97,37 @@ class AncestorsRelation extends BaseRelation
      */
     protected static function getAncestorIds(Model $model, Collection $relations): array
     {
-        /** @var Collection|Model[]|NestedSetModelTrait[] $ancestors */
-        $ancestors = clone $relations;
-        $result = [];
+        if ($model->getParentId() === null) {
+            return [];
+        }
 
-        foreach ($ancestors as $index => $ancestor) {
-            $ancestorId = $ancestor->getKey();
-            $modelParentId = $model->getParentId();
+        return self::getAncestorsRecursively($relations, $model->getParentId())
+            ->pluck($model->getKeyName())
+            ->unique()
+            ->toArray();
+    }
 
-            if ($modelParentId === $ancestorId) {
-                $result[] = $ancestorId;
-                $subAncestors = self::getAncestorIds($ancestor, $ancestors->forget($index));
+    /**
+     * Рекурсивно ищет предков по parent_id.
+     *
+     * @param Collection $models
+     * @param mixed      $parentId
+     *
+     * @return Collection
+     */
+    private static function getAncestorsRecursively(Collection $models, $parentId): Collection
+    {
+        $result = new Collection();
 
-                foreach ($subAncestors as $id) {
-                    $result[] = $id;
+        /** @var Model|NestedSetModelTrait $model */
+        foreach ($models as $model) {
+            if ((string) $model->getKey() === (string) $parentId) {
+                $result->push($model);
+
+                if ($model->getParentId() !== null) {
+                    foreach (self::getAncestorsRecursively($models, $model->getParentId()) as $ancestor) {
+                        $result->push($ancestor);
+                    }
                 }
             }
         }

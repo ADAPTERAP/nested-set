@@ -36,7 +36,7 @@ class SiblingsRelation extends BaseRelation
                         /** @var NestedSetModelTrait $potentialSibling */
                         $potentialSiblingParentId = $potentialSibling->getParentId();
 
-                        return $potentialSiblingParentId === $modelParentId;
+                        return (string) $potentialSiblingParentId === (string) $modelParentId;
                     })
                     ->values()
             );
