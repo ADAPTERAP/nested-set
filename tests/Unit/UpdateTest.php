@@ -17,8 +17,6 @@ class UpdateTest extends TestCase
 {
     /**
      * Попытка переместить элемент вниз по дереву.
-     *
-     * @group 123
      */
     public function testRebaseDownChild(): void
     {
@@ -40,72 +38,12 @@ class UpdateTest extends TestCase
         $this->assertDatabaseHas('categories', ['id' => $root3->id, 'lft' => 10, 'rgt' => 13, 'depth' => 0]);
         $this->assertDatabaseHas('categories', ['id' => $child31->id, 'lft' => 11, 'rgt' => 12, 'depth' => 1]);
 
-//        $categories = DB::table('categories')->get()->toArray();
-//        DB::flushQueryLog();
-//        DB::enableQueryLog();
-
         $target->update(['parent_id' => $child21->id, 'name' => '2.1.1']);
 
-//        $this->assertDatabaseHas('categories', ['id' => $root1->id, 'lft' => 0, 'rgt' => 3, 'depth' => 0]);
-//        $this->assertDatabaseHas('categories', ['id' => $child11->id, 'lft' => 1, 'rgt' => 2, 'depth' => 1]);
-//        $this->assertDatabaseHas('categories', ['id' => $root2->id, 'lft' => 4, 'rgt' => 9, 'depth' => 0]);
-//        $this->assertDatabaseHas('categories', ['id' => $child21->id, 'lft' => 5, 'rgt' => 8, 'depth' => 1]);
-
-//        dd([
-//            //            'query' => ['id' => $target->id, 'lft' => 6, 'rgt' => 7, 'depth' => 2, 'name' => '2.1.1'],
-//            //            'queries' => DB::getQueryLog(),
-//            'target_id' => $target->id,
-//            '$child21->id' => $child21->id,
-//            //            'before' => $categories,
-//            'after' => DB::table('categories')->get()->toArray(),
-//            'item' => DB::select('
-//                WITH
-//                    item AS (SELECT id, lft, rgt, depth FROM categories WHERE id = ?),
-//                     newParent AS (SELECT id, lft, rgt, depth FROM categories WHERE id = ?),
-//                     tree AS (SELECT id FROM categories WHERE lft >= (SELECT lft FROM item) AND rgt <= (SELECT rgt FROM item)),
-//                     diffBetweenRgtAndLft AS (SELECT (SELECT rgt FROM item) - (SELECT lft FROM item) AS diff),
-//                     coefficients AS (SELECT (SELECT diff FROM diffBetweenRgtAndLft) + 1 AS ancestorsLft, CASE WHEN (SELECT lft FROM item) < (SELECT lft FROM newParent) THEN (SELECT lft FROM newParent) - (SELECT diff FROM diffBetweenRgtAndLft) - (SELECT lft FROM item) WHEN (SELECT lft FROM item) > (SELECT lft FROM newParent) then (SELECT lft FROM item) - (SELECT lft FROM newParent) - 1 ELSE 1 END AS subTreeLft)
-//                SELECT * FROM item
-//            ', [$target->id, $target->id]),
-//            'newParent' => DB::select('
-//                WITH
-//                    item AS (SELECT id, lft, rgt, depth FROM categories WHERE id = ?),
-//                     newParent AS (SELECT id, lft, rgt, depth FROM categories WHERE id = ?),
-//                     tree AS (SELECT id FROM categories WHERE lft >= (SELECT lft FROM item) AND rgt <= (SELECT rgt FROM item)),
-//                     diffBetweenRgtAndLft AS (SELECT (SELECT rgt FROM item) - (SELECT lft FROM item) AS diff),
-//                     coefficients AS (SELECT (SELECT diff FROM diffBetweenRgtAndLft) + 1 AS ancestorsLft, CASE WHEN (SELECT lft FROM item) < (SELECT lft FROM newParent) THEN (SELECT lft FROM newParent) - (SELECT diff FROM diffBetweenRgtAndLft) - (SELECT lft FROM item) WHEN (SELECT lft FROM item) > (SELECT lft FROM newParent) then (SELECT lft FROM item) - (SELECT lft FROM newParent) - 1 ELSE 1 END AS subTreeLft)
-//                SELECT * FROM newParent
-//            ', [$target->id, $target->id]),
-//            'tree' => DB::select('
-//                WITH
-//                    item AS (SELECT id, lft, rgt, depth FROM categories WHERE id = ?),
-//                     newParent AS (SELECT id, lft, rgt, depth FROM categories WHERE id = ?),
-//                     tree AS (SELECT id FROM categories WHERE lft >= (SELECT lft FROM item) AND rgt <= (SELECT rgt FROM item)),
-//                     diffBetweenRgtAndLft AS (SELECT (SELECT rgt FROM item) - (SELECT lft FROM item) AS diff),
-//                     coefficients AS (SELECT (SELECT diff FROM diffBetweenRgtAndLft) + 1 AS ancestorsLft, CASE WHEN (SELECT lft FROM item) < (SELECT lft FROM newParent) THEN (SELECT lft FROM newParent) - (SELECT diff FROM diffBetweenRgtAndLft) - (SELECT lft FROM item) WHEN (SELECT lft FROM item) > (SELECT lft FROM newParent) then (SELECT lft FROM item) - (SELECT lft FROM newParent) - 1 ELSE 1 END AS subTreeLft)
-//                SELECT * FROM tree
-//            ', [$target->id, $target->id]),
-//            'diffBetweenRgtAndLft' => DB::select('
-//                WITH
-//                    item AS (SELECT id, lft, rgt, depth FROM categories WHERE id = ?),
-//                     newParent AS (SELECT id, lft, rgt, depth FROM categories WHERE id = ?),
-//                     tree AS (SELECT id FROM categories WHERE lft >= (SELECT lft FROM item) AND rgt <= (SELECT rgt FROM item)),
-//                     diffBetweenRgtAndLft AS (SELECT (SELECT rgt FROM item) - (SELECT lft FROM item) AS diff),
-//                     coefficients AS (SELECT (SELECT diff FROM diffBetweenRgtAndLft) + 1 AS ancestorsLft, CASE WHEN (SELECT lft FROM item) < (SELECT lft FROM newParent) THEN (SELECT lft FROM newParent) - (SELECT diff FROM diffBetweenRgtAndLft) - (SELECT lft FROM item) WHEN (SELECT lft FROM item) > (SELECT lft FROM newParent) then (SELECT lft FROM item) - (SELECT lft FROM newParent) - 1 ELSE 1 END AS subTreeLft)
-//                SELECT * FROM diffBetweenRgtAndLft
-//            ', [$target->id, $target->id]),
-//            'coefficients' => DB::select('
-//                WITH
-//                    item AS (SELECT id, lft, rgt, depth FROM categories WHERE id = ?),
-//                     newParent AS (SELECT id, lft, rgt, depth FROM categories WHERE id = ?),
-//                     tree AS (SELECT id FROM categories WHERE lft >= (SELECT lft FROM item) AND rgt <= (SELECT rgt FROM item)),
-//                     diffBetweenRgtAndLft AS (SELECT (SELECT rgt FROM item) - (SELECT lft FROM item) AS diff),
-//                     coefficients AS (SELECT (SELECT diff FROM diffBetweenRgtAndLft) + 1 AS ancestorsLft, CASE WHEN (SELECT lft FROM item) < (SELECT lft FROM newParent) THEN (SELECT lft FROM newParent) - (SELECT diff FROM diffBetweenRgtAndLft) - (SELECT lft FROM item) WHEN (SELECT lft FROM item) > (SELECT lft FROM newParent) then (SELECT lft FROM item) - (SELECT lft FROM newParent) - 1 ELSE 1 END AS subTreeLft)
-//                SELECT * FROM coefficients
-//            ', [$target->id, $target->id]),
-//        ]);
-
-        dump(DB::select('select sqlite_version();'));
+        $this->assertDatabaseHas('categories', ['id' => $root1->id, 'lft' => 0, 'rgt' => 3, 'depth' => 0]);
+        $this->assertDatabaseHas('categories', ['id' => $child11->id, 'lft' => 1, 'rgt' => 2, 'depth' => 1]);
+        $this->assertDatabaseHas('categories', ['id' => $root2->id, 'lft' => 4, 'rgt' => 9, 'depth' => 0]);
+        $this->assertDatabaseHas('categories', ['id' => $child21->id, 'lft' => 5, 'rgt' => 8, 'depth' => 1]);
 
         $this->assertDatabaseHas('categories', ['id' => $target->id, 'lft' => 6, 'rgt' => 7, 'depth' => 2, 'name' => '2.1.1']);
         $this->assertDatabaseHas('categories', ['id' => $root3->id, 'lft' => 10, 'rgt' => 13, 'depth' => 0]);
