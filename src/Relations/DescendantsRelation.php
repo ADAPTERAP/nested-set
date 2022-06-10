@@ -103,7 +103,7 @@ class DescendantsRelation extends BaseRelation
 
         /** @var Model|NestedSetModelTrait $model */
         foreach ($models as $model) {
-            if ((string)$model->getParentId() === (string)$parentId) {
+            if ((string) $model->getParentId() === (string) $parentId) {
                 $result->push($model);
 
                 foreach (self::getDescendantsRecursively($models, $model->getKey()) as $descendant) {
