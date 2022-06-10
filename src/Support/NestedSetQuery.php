@@ -45,7 +45,10 @@ class NestedSetQuery
             $actualColumnNames[] = $model->getDeletedAtColumn();
         }
 
-        return str_replace($templateColumnNames, $actualColumnNames, $query);
+        $result = str_replace($templateColumnNames, $actualColumnNames, $query);
+        $result = preg_replace(['/(--|#)[^\n]+/', '/\n/'], ['', ' '], $result);
+
+        return preg_replace(['/\s{2,}/', '/\s+,\s*/'], [' ', ', '], $result);
     }
 
     /**
