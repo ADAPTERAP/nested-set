@@ -171,7 +171,7 @@ trait Subscriber
                     self::class,
                     json_encode([
                         'currentValue' => $this->getAttribute($scope),
-                        'parent' => $parent ? $parent->toArray() : null,
+                        'parent' => isset($parent) ? $parent->toArray() : null,
                         '$this->parent' => $this->parent ? $this->parent->toArray() : null,
                         'parentValue' => ($parent ?? $this->parent)->getAttribute($scope),
                     ])
