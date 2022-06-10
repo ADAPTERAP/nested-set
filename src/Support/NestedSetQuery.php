@@ -61,6 +61,7 @@ class NestedSetQuery
             $value = $model->getAttribute($scope);
 
             if ($value === null) {
+                $sql .= " AND {$scope} IS NULL";
                 continue;
             }
 
