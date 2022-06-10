@@ -93,7 +93,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
     public function setUp(): void
     {
         $this->app = $this->createApplication();
-        $this->app->bind('db', fn() => Manager::connection('default'));
+        $this->app->bind('db', fn () => Manager::connection('default'));
 
         parent::setUp();
 

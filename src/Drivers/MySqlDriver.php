@@ -17,7 +17,7 @@ class MySqlDriver extends NestedSetDriver
      * - всех элементов ниже $lft.
      *
      * @param mixed $primary Идентификатор созданного элемента
-     * @param int   $lft Индекс вложенности слева созданного элемента
+     * @param int   $lft     Индекс вложенности слева созданного элемента
      */
     public function freshIndexesAfterInsert($primary, int $lft): void
     {
@@ -143,7 +143,7 @@ class MySqlDriver extends NestedSetDriver
 
         $sql .= $this->getWhereClauseForRebaseSubTree();
 
-        return (int)$this->model->getConnection()->statement(
+        return (int) $this->model->getConnection()->statement(
             NestedSetQuery::prepare($sql, $this->model),
             $bindings
         );
