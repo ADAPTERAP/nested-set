@@ -76,28 +76,38 @@ class DescendantsRelation extends BaseRelation
     /**
      * Возвращает массив идентификаторов потомков для указанной модели.
      *
-     * @param Model|NestedSetModelTrait                $model
-     * @param Collection|Model[]|NestedSetModelTrait[] $relations
+     * @param Model|NestedSetModelTrait $model
+     * @param Collection                $relations
      *
      * @return int[]
      */
     protected static function getDescendantIds(Model $model, Collection $relations): array
     {
-        /** @var Collection|Model[]|NestedSetModelTrait[] $descendants */
-        $descendants = clone $relations;
-        $modelId = $model->getAttribute($model->getKeyName());
-        $result = [];
+        return self::getDescendantsRecursively($relations, $model->getKey())
+            ->pluck($model->getKeyName())
+            ->unique()
+            ->toArray();
+    }
 
-        foreach ($descendants as $index => $descendant) {
-            $descendantParentId = $descendant->getParentId();
-            $descendantPrimary = $descendant->getKey();
+    /**
+     * Рекурсивно ищет потомков по parent_id.
+     *
+     * @param Collection $models
+     * @param mixed      $parentId
+     *
+     * @return Collection
+     */
+    private static function getDescendantsRecursively(Collection $models, $parentId): Collection
+    {
+        $result = new Collection();
 
-            if ($modelId === $descendantParentId) {
-                $result[] = $descendantPrimary;
-                $subDescendants = self::getDescendantIds($descendant, $descendants->forget($index));
+        /** @var Model|NestedSetModelTrait $model */
+        foreach ($models as $model) {
+            if ((string)$model->getParentId() === (string)$parentId) {
+                $result->push($model);
 
-                foreach ($subDescendants as $id) {
-                    $result[] = $id;
+                foreach (self::getDescendantsRecursively($models, $model->getKey()) as $descendant) {
+                    $result->push($descendant);
                 }
             }
         }
