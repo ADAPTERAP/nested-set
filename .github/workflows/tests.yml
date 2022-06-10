@@ -9,17 +9,10 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.1
+          php-version: 8.0
 
       - name: Install Dependencies via Composer
         run: composer install --no-ansi --no-interaction --no-scripts --no-suggest --no-progress --prefer-dist
 
       - name: Execute tests via PHPUnit
-        run: vendor/bin/phpunit --group 123
-
-      - name: Archive production artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: database.sqlite
-          path: |
-            database.sqlite
+        run: vendor/bin/phpunit
