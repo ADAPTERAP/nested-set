@@ -42,6 +42,7 @@ class AncestorsTest extends TestCase
 
     /**
      * Попытка получить список предков.
+     * @group 123
      */
     public function testGetViaBuilderWithScope(): void
     {
