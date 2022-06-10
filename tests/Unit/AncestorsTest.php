@@ -7,6 +7,7 @@ use Adapterap\NestedSet\Tests\Models\Category;
 use Adapterap\NestedSet\Tests\Models\Menu;
 use Adapterap\NestedSet\Tests\Models\MenuItem;
 use Adapterap\NestedSet\Tests\TestCase;
+use Illuminate\Support\Facades\DB;
 
 /**
  * @internal
@@ -98,6 +99,11 @@ class AncestorsTest extends TestCase
         ]);
 
         // child1112
+        if ($children->get(0)->ancestors->isEmpty()) {
+            DB::enableQueryLog();
+            $children->get(0)->ancestors()->get();
+            dd(DB::getQueryLog());
+        }
         self::assertCount(3, $children->get(0)->ancestors);
         self::assertEquals($child111->id, $children->get(0)->ancestors->get(0)->id);
         self::assertEquals($child11->id, $children->get(0)->ancestors->get(1)->id);
