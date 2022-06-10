@@ -45,23 +45,6 @@ class TestCase extends \Orchestra\Testbench\TestCase
             return;
         }
 
-        //        self::$isConfiguredManager = true;
-        //
-        //        $dotenv = Dotenv::createImmutable(dirname(__DIR__));
-        //        $dotenv->load();
-        //
-        //        $manager = new Manager();
-        //        $manager->addConnection([
-        //            'driver' => 'mysql',
-        //            'host' => env('DB_HOST', 'mysqldb'),
-        //            'port' => env('DB_PORT', 3306),
-        //            'database' => env('DB_DATABASE', 'nested'),
-        //            'username' => env('DB_USERNAME', 'root'),
-        //            'password' => env('DB_PASSWORD', 'password'),
-        //            'charset' => 'utf8',
-        //            'collation' => 'utf8_unicode_ci',
-        //        ]);
-
         self::$isConfiguredManager = true;
 
         $databasePath = dirname(__DIR__) . '/database.sqlite';
