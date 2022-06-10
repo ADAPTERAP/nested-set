@@ -47,7 +47,7 @@ class UpdateTest extends TestCase
 
         dd([
             'query' => ['id' => $target->id, 'lft' => 6, 'rgt' => 7, 'depth' => 2, 'name' => '2.1.1'],
-            'actual' => DB::table('categories')->where('id', $target->id),
+            'actual' => DB::table('categories')->where('id', $target->id)->get(),
         ]);
 
         $this->assertDatabaseHas('categories', ['id' => $target->id, 'lft' => 6, 'rgt' => 7, 'depth' => 2, 'name' => '2.1.1']);
