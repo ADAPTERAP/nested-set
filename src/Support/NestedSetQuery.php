@@ -19,21 +19,30 @@ class NestedSetQuery
      */
     public static function prepare(string $query, Model $model)
     {
-        $templateColumnNames = ['`lft`', '`rgt`', '`parent_id`', '`depth`', '`id`', '`table`', '`scopes`', '`whereScopes`'];
+        $templateColumnNames = [
+            '$lftName',
+            '$rgtName',
+            '$parentIdName',
+            '$depthName',
+            '$idName',
+            '$tableName',
+            '$scopes',
+            '$whereScopes',
+        ];
         $actualColumnNames = [
-            "`{$model->getLftName()}`",
-            "`{$model->getRgtName()}`",
-            "`{$model->getParentIdName()}`",
-            "`{$model->getDepthName()}`",
-            "`{$model->getKeyName()}`",
-            "`{$model->getTable()}`",
+            $model->getLftName(),
+            $model->getRgtName(),
+            $model->getParentIdName(),
+            $model->getDepthName(),
+            $model->getKeyName(),
+            $model->getTable(),
             self::addScopeToSql($model),
             self::addScopeToSql($model, true),
         ];
 
         if ($model->nestedSetHasSoftDeletes()) {
-            $templateColumnNames[] = '`deleted_at`';
-            $actualColumnNames[] = "`{$model->getDeletedAtColumn()}`";
+            $templateColumnNames[] = '$deletedAtName';
+            $actualColumnNames[] = $model->getDeletedAtColumn();
         }
 
         return str_replace($templateColumnNames, $actualColumnNames, $query);

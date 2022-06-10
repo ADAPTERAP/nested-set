@@ -3,10 +3,10 @@
 namespace Adapterap\NestedSet\Relations;
 
 use Adapterap\NestedSet\NestedSetModelTrait;
+use Adapterap\NestedSet\Support\NestedSetQuery;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Query\Expression;
 
 /**
  * Class AncestorsRelation.
@@ -64,14 +64,17 @@ class AncestorsRelation extends BaseRelation
     protected static function addFiltersForModel(Builder $builder, Model $model): Builder
     {
         $lftName = $model->getLftName();
-        $rgtName = $model->getRgtName();
-        $tableName = $model->getTable();
-        $primaryName = $model->getKeyName();
-        $primary = $model->getAttribute($primaryName);
+        $primary = $model->getKey();
 
         $builder
-            ->where($lftName, '<', new Expression("(SELECT `{$lftName}` FROM `{$tableName}` WHERE `{$primaryName}` = {$primary})"))
-            ->where($rgtName, '>', new Expression("(SELECT `{$rgtName}` FROM `{$tableName}` WHERE `{$primaryName}` = {$primary})"))
+            ->whereRaw(
+                NestedSetQuery::prepare('$lftName < (SELECT $lftName FROM $tableName WHERE $idName = ?)', $model),
+                [$primary]
+            )
+            ->whereRaw(
+                NestedSetQuery::prepare('$rgtName > (SELECT $rgtName FROM $tableName WHERE $idName = ?)', $model),
+                [$primary]
+            )
             ->orderByDesc($lftName);
 
         return self::addScopeFilter($builder, $model);
