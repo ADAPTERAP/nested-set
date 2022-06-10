@@ -94,23 +94,9 @@ class AncestorsTest extends TestCase
         ] = $this->createCategoryTree();
 
         $children = (new Category())->newCollection([$child1112, $child21, $child31]);
-        DB::enableQueryLog();
         $children->load('ancestors');
 
         // child1112
-        if ($children->get(0)->ancestors->isEmpty()) {
-            $children->get(0)->ancestors()->get();
-            dd([
-                'queries' => DB::getQueryLog(),
-                'id' => $children->get(0)->id,
-                'categories' => DB::table('categories')->get(),
-                'ancestors' => DB::table('categories')
-                    ->where('lft', '<', 5)
-                    ->where('rgt', '>', 6)
-                    ->get(),
-                '$children->ancestors' => $children->toArray(),
-            ]);
-        }
         self::assertCount(3, $children->get(0)->ancestors);
         self::assertEquals($child111->id, $children->get(0)->ancestors->get(0)->id);
         self::assertEquals($child11->id, $children->get(0)->ancestors->get(1)->id);
