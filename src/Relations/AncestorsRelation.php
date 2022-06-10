@@ -77,6 +77,13 @@ class AncestorsRelation extends BaseRelation
             )
             ->orderByDesc($lftName);
 
+        foreach ($model->getScopeAttributes() as $scope) {
+            $builder->whereRaw(
+                NestedSetQuery::prepare($scope . ' = (SELECT ' . $scope . ' FROM $tableName WHERE $idName = ?)', $model),
+                [$primary]
+            );
+        }
+
         return self::addScopeFilter($builder, $model);
     }
 
