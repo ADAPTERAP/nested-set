@@ -108,7 +108,7 @@ class AncestorsTest extends TestCase
                 'categories' => DB::table('categories')->get(),
                 'ancestors' => DB::table('categories')
                     ->where('lft', '<', 5)
-                    ->where('rgt', '<', 6)
+                    ->where('rgt', '>', 6)
                     ->get()
             ]);
         }
