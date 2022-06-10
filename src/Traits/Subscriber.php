@@ -164,6 +164,20 @@ trait Subscriber
                 continue;
             }
 
+            throw new \RuntimeException(
+                sprintf(
+                    'Generic parameter %s for the model %s is different from parent. %s',
+                    $scope,
+                    self::class,
+                    json_encode([
+                        'currentValue' => $this->getAttribute($scope),
+                        'parent' => $parent ? $parent->toArray() : null,
+                        '$this->parent' => $this->parent ? $this->parent->toArray() : null,
+                        'parentValue' => ($parent ?? $this->parent)->getAttribute($scope),
+                    ])
+                )
+            );
+
             throw new NestedSetCreateChildHasOtherScope(self::class, $scope);
         }
     }
