@@ -102,7 +102,11 @@ class AncestorsTest extends TestCase
         if ($children->get(0)->ancestors->isEmpty()) {
             DB::enableQueryLog();
             $children->get(0)->ancestors()->get();
-            dd(DB::getQueryLog());
+            dd([
+                'queries' => DB::getQueryLog(),
+                'id' => $children->get(0)->id,
+                'categories' => DB::table('categories')->get(),
+            ]);
         }
         self::assertCount(3, $children->get(0)->ancestors);
         self::assertEquals($child111->id, $children->get(0)->ancestors->get(0)->id);
