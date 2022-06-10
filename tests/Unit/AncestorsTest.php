@@ -68,8 +68,6 @@ class AncestorsTest extends TestCase
 
     /**
      * Проверка корректности работы load() в коллекции.
-     *
-     * @group 123
      */
     public function testLoadFromCollection(): void
     {

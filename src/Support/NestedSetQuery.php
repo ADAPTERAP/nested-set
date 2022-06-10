@@ -48,7 +48,7 @@ class NestedSetQuery
         $result = str_replace($templateColumnNames, $actualColumnNames, $query);
         $result = preg_replace(['/(--|#)[^\n]+/', '/\n/'], ['', ' '], $result);
 
-        return preg_replace(['/\s{2,}/', '/\s+,\s*/'], [' ', ', '], $result);
+        return preg_replace(['/\s{2,}/', '/\s+,\s*/', '/\s+\)/', '/^\s+/', '/\s+$/'], [' ', ', ', ')', '', ''], $result);
     }
 
     /**
